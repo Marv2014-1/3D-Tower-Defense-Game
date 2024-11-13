@@ -1,0 +1,10 @@
+# Automatically normalize line endings across platforms
+* text=auto
+
+# Treat specific files as binary to avoid line ending conversions
+*.obj binary
+*.mtl binary
+*.meta binary
+*.unitypackage binary
+*.apk binary
+*.aab binary
