@@ -1,10 +1,18 @@
-# Automatically normalize line endings across platforms
+# Set default behavior to automatically normalize line endings.
 * text=auto
 
-# Treat specific files as binary to avoid line ending conversions
-*.obj binary
-*.mtl binary
-*.meta binary
-*.unitypackage binary
-*.apk binary
-*.aab binary
+# Explicitly declare text files you want to always be normalized and converted to LF on checkout.
+*.cs     text
+*.shader text
+*.gltf  text
+
+# Declare binary files to be treated as binary and not modified.
+*.fbx    binary
+*.mtl    binary
+*.png    binary
+*.jpg    binary
+*.jpeg   binary
+*.gif    binary
+*.ico    binary
+*.dll    binary
+*.exe    binary

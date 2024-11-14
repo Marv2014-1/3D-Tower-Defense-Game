@@ -72,5 +72,3 @@ crashlytics-build.properties
 /[Aa]ssets/[Ss]treamingAssets/aa.meta
 /[Aa]ssets/[Ss]treamingAssets/aa/*
 
-# Ignore specific imported assets if path length is an issue
-/Assets/Art/3D/KayKit_Medieval_Hexagon_Pack_1.0_FREE/
