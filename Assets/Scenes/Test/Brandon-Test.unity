@@ -1657,7 +1657,6 @@ GameObject:
   m_Component:
   - component: {fileID: 3901091577453778465}
   - component: {fileID: 3901091577453778466}
-  - component: {fileID: 3901091577453778467}
   - component: {fileID: 3270951601822387278}
   m_Layer: 0
   m_Name: Player
@@ -2057,16 +2056,14 @@ MonoBehaviour:
   camPos: {fileID: 826385949}
   slowSpeed: 6
   runSpeed: 15
-  maxSpeed: 20
-  brakeSpeed: 0.25
   turnSpeed: 2
   jumpTimer: 100
   gravityScale: 1
   gravityBase: -9.81
   jumpPower:
-  - 6
-  - 8.5
-  - 11
+  - 3
+  - 5
+  - 7.5
   isGrounded: 0
 --- !u!4 &3283093980072170177
 Transform:
@@ -2322,35 +2319,8 @@ Transform:
   - {fileID: 494425744925003617}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!54 &3901091577453778466
-Rigidbody:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1434594428397626273}
-  serializedVersion: 4
-  m_Mass: 1
-  m_Drag: 0
-  m_AngularDrag: 0.05
-  m_CenterOfMass: {x: 0, y: 0, z: 0}
-  m_InertiaTensor: {x: 1, y: 1, z: 1}
-  m_InertiaRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_IncludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ExcludeLayers:
-    serializedVersion: 2
-    m_Bits: 0
-  m_ImplicitCom: 1
-  m_ImplicitTensor: 1
-  m_UseGravity: 0
-  m_IsKinematic: 0
-  m_Interpolate: 0
-  m_Constraints: 112
-  m_CollisionDetection: 0
---- !u!136 &3901091577453778467
-CapsuleCollider:
+--- !u!143 &3901091577453778466
+CharacterController:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -2367,11 +2337,14 @@ CapsuleCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 2
+  serializedVersion: 3
+  m_Height: 2
   m_Radius: 0.5
-  m_Height: 2.2
-  m_Direction: 1
-  m_Center: {x: 0, y: 1.1, z: 0}
+  m_SlopeLimit: 45
+  m_StepOffset: 0.3
+  m_SkinWidth: 0.08
+  m_MinMoveDistance: 0.001
+  m_Center: {x: 0, y: 1, z: 0}
 --- !u!4 &3948293363511125041
 Transform:
   m_ObjectHideFlags: 0

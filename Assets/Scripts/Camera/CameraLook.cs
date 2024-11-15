@@ -16,7 +16,7 @@ public class CameraLook : MonoBehaviour
     public float lookXLimit = 7.5f;
     public float lookXMod = 25f;
     public float lookYLimit = 25f;
-    public float turnSpeed = 10f;
+    public float turnSpeed = 2f;
     private float rotationX = 25;
     private float rotationY = 0;
     private bool mapCam = false;
@@ -70,17 +70,22 @@ public class CameraLook : MonoBehaviour
         {
             Turn();
 
+            // Keeps the camera in the same position relative to the player
             transform.position = Vector3.Lerp(transform.position, targetPos + playerBody.position, speed);
             transform.LookAt(playerBody.transform.position);
-            compass.localRotation = Quaternion.Euler(-25, 0, 0);
+
+            // Ensures the compass's world rotation stays at (0, 0, 0), this is needed for the player's movement
+            compass.eulerAngles = new Vector3(0, compass.eulerAngles.y, compass.eulerAngles.z);
         }    
     }
 
+    // Circles the camera around the player using mouse movement
     void Turn()
     {
         targetPos = Quaternion.AngleAxis(Input.GetAxis("Mouse X") * turnSpeed, Vector3.up) * targetPos;
     }
 
+    // Switches the camera from a 3rd person view to a bird's eye view
     void SwitchCam()
     {
         mapCam = !mapCam;

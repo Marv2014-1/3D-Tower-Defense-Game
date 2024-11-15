@@ -2,166 +2,142 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-[RequireComponent(typeof(Rigidbody))]
+[RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
+    private CharacterController cc;
     public Transform camPos;
+    private Vector3 moveDir = Vector3.zero,
+        velocity;
     public float slowSpeed = 6f,
         runSpeed = 15f,
-        maxSpeed = 20f,
-        brakeSpeed = 0.25f,
-        turnSpeed = 2f,
+        moveSpeed,
+        turnSpeed = 0.1f,
         jumpTimer = 0.5f,
         gravityScale = 1.0f,
         gravityBase = -9.81f;
     public float[] jumpPower = { 7f, 10f, 14f };
     private int jumps = 0,
-        maxJumps = 3;
-
-    private Vector3 moveDirection = Vector3.zero,
-        turnDir;
-    private Rigidbody rb;
-
-    private bool canMove = true,
-        startJump = false;
-    public bool isGrounded = false;
+        maxJumps = 3,
+        jumpStage = 0;
+    private bool canMove = true;
+    public bool isGrounded;
 
     void Start()
     {
-        rb = GetComponent<Rigidbody>();
-        turnDir = camPos.TransformDirection(Vector3.forward);
+        cc = GetComponent<CharacterController>();
+        moveSpeed = runSpeed;
     }
 
     void Update()
     {
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            startJump = true;
+            Jump();
         }
     }
 
     void FixedUpdate()
     {
-        if (isGrounded)
+        // This is my gross solution to finding out the exact frame the player lands after a jump. I did my best leave me alone.
+        if (jumpStage == 1)
         {
-            GetMovement();
-            Brake();
-        }
-
-        if (rb.velocity.magnitude < maxSpeed)
-        {
-            rb.AddForce(moveDirection);
-        }
-
-        if (startJump)
-        {
-            Jump();
-        }
-
-        if (!isGrounded)
-        {
-            rb.AddForce(gravityBase * gravityScale * Vector3.up, ForceMode.Acceleration);
-        } 
-        else
-        {
-            rb.AddForce(Vector3.up * -2f, ForceMode.Acceleration);
+            jumpStage = 2;
         }
         
-        //Debug.Log(rb.velocity.magnitude);
+        GetMovement();
+
+        if (isGrounded)
+        {
+            if (moveDir != Vector3.zero)
+            {
+                //Turn();
+            }
+
+            if (velocity.y < 0)
+            {
+                velocity.y = 0;
+            }
+        }
+
+        // Moves player according to movement direction
+        cc.Move(moveDir * Time.deltaTime);
+        InstantTurn();
+        // Applies gravity to player
+        velocity.y += gravityBase * Time.deltaTime;
+        cc.Move(velocity * Time.deltaTime);
+
+        isGrounded = cc.isGrounded;
+        if (isGrounded && jumpStage == 2)
+        {
+            StartCoroutine(JumpTimer());
+        }
     }
 
     void GetMovement()
     {
+        // Get direction camera is facing
         Vector3 forward = camPos.TransformDirection(Vector3.forward);
         Vector3 right = camPos.TransformDirection(Vector3.right);
 
-        bool isSlow = Input.GetKey(KeyCode.LeftShift);
-        float curSpeedX = canMove ? (isSlow ? slowSpeed : runSpeed) * Input.GetAxis("Vertical") : 0;
-        float curSpeedZ = canMove ? (isSlow ? slowSpeed : runSpeed) * Input.GetAxis("Horizontal") : 0;
-        moveDirection = (forward * curSpeedX + right * curSpeedZ);
+        // Get player inputs, combine with camera direction to get base direction of movement
+        bool isSlow = Input.GetKey(KeyCode.LeftShift) || !isGrounded;
+        float curSpeedX = canMove ? Input.GetAxis("Vertical") : 0;
+        float curSpeedZ = canMove ? Input.GetAxis("Horizontal") : 0;
+        moveDir = (forward * curSpeedX + right * curSpeedZ);
 
-        if (moveDirection != Vector3.zero)
+        // Normalize movement if it exceeds a magnitude of 1 (prevents speed bug when moving diagonally)
+        if (moveDir.sqrMagnitude > 1f)
         {
-            Turn();
+            moveDir.Normalize();
         }
+
+        // Apply either run or slow speed, slow speed is used for moving while jumping
+        moveSpeed = isSlow ? Mathf.Lerp(moveSpeed, slowSpeed, 0.12f) : Mathf.Lerp(moveSpeed, runSpeed, 0.12f);
+        moveDir *= moveSpeed;
     }
 
-    void Brake()
-    {
-        if (Input.GetAxis("Vertical") == 0f && Input.GetAxis("Horizontal") == 0f && rb.velocity.magnitude > 1f)
-        {
-            rb.drag += brakeSpeed;
-        }
-        else
-        {
-            rb.drag -= brakeSpeed;
-        }
-
-        rb.drag = Mathf.Clamp(rb.drag, 0f, 100f);
-    }
-
+    // Ensures player smoothly turns to face the direction they're moving in
     void Turn()
     {
-        
-        if (Input.GetAxis("Vertical") > 0)
-        {
-            turnDir = camPos.TransformDirection(Vector3.forward);
-        } 
-        else if (Input.GetAxis("Vertical") < 0)
-        {
-            turnDir = -camPos.TransformDirection(Vector3.forward);
-        }
-
-        if (Input.GetAxis("Horizontal") > 0)
-        {
-            turnDir += camPos.TransformDirection(Vector3.right);
-        }
-        else if (Input.GetAxis("Horizontal") < 0)
-        {
-            turnDir += -camPos.TransformDirection(Vector3.right);
-        }
-
-        transform.rotation = Quaternion.Lerp(transform.rotation, Quaternion.LookRotation(turnDir), turnSpeed * Time.deltaTime);
+        Quaternion lookDir = Quaternion.LookRotation(moveDir);
+        transform.rotation = Quaternion.Lerp(transform.rotation, lookDir, Time.deltaTime * turnSpeed);
     }
 
+    // Faces the player in the direction they're moving in immediately, used for jumping
+    void InstantTurn()
+    {
+        if (moveDir != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(moveDir);
+        }
+    }
+
+    // Adjusts player's y-value to jump, also tracks number of jumps for triple jump
     void Jump()
     {
-        Debug.Log("Jump");
-        startJump = false;
-        rb.drag = 0;
-        rb.AddForce(Vector3.up * jumpPower[jumps], ForceMode.Impulse);
+        InstantTurn();
+        velocity.y += Mathf.Sqrt(jumpPower[jumps] * -2.0f * gravityBase);
 
         jumps++;
         if (jumps >= maxJumps)
         {
             jumps = 0;
         }
+
+        jumpStage = 1;
     }
 
+    // Tracks how long the player has been on the ground since last jump, needed for triple jump
     IEnumerator JumpTimer()
     {
-        yield return new WaitForSeconds(1);
+        jumpStage = 0;
+
+        yield return new WaitForSeconds(0.33f);
 
         if (isGrounded)
         {
             jumps = 0;
-        }
-    }
-
-    void OnCollisionEnter(Collision collision)
-    {
-        if (collision.gameObject.name == "Ground")
-        {
-            isGrounded = true;
-            StartCoroutine(JumpTimer());
-        }
-    }
-
-    void OnCollisionExit(Collision collision)
-    {
-        if (collision.gameObject.name == "Ground")
-        {
-            isGrounded = false;
         }
     }
 }
