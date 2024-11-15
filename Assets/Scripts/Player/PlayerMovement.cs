@@ -5,66 +5,139 @@ using UnityEngine;
 [RequireComponent(typeof(CharacterController))]
 public class PlayerMovement : MonoBehaviour
 {
-    [Header("Movement Settings")]
-    public float speed = 6.0f;
-    public float gravity = -9.81f;
-    public float jumpHeight = 1.5f;
-
-    private CharacterController controller;
-    private Vector3 velocity;
-    private bool isGrounded;
-
-    [Header("Camera Settings")]
-    public Transform playerCamera;
-    public float cameraDistance = 0.0f; // Not necessary for first-person but kept if needed
+    private CharacterController cc;
+    public Transform camPos;
+    private Vector3 moveDir = Vector3.zero,
+        velocity;
+    public float slowSpeed = 6f,
+        runSpeed = 15f,
+        moveSpeed,
+        turnSpeed = 0.1f,
+        jumpTimer = 0.5f,
+        gravityScale = 1.0f,
+        gravityBase = -9.81f;
+    public float[] jumpPower = { 7f, 10f, 14f };
+    private int jumps = 0,
+        maxJumps = 3,
+        jumpStage = 0;
+    private bool canMove = true;
+    public bool isGrounded;
 
     void Start()
     {
-        controller = GetComponent<CharacterController>();
-        if (playerCamera == null)
-        {
-            playerCamera = Camera.main.transform;
-        }
-
-        // Ensure camera is properly positioned
-        playerCamera.localPosition = new Vector3(0, 1.6f, 0); // Adjust as needed
+        cc = GetComponent<CharacterController>();
+        moveSpeed = runSpeed;
     }
 
     void Update()
     {
-        // Ground Check
-        isGrounded = controller.isGrounded;
-        if (isGrounded && velocity.y < 0)
-        {
-            velocity.y = -2f; // Small negative value to keep grounded
-        }
-
-        // Input
-        float moveX = Input.GetAxis("Horizontal");
-        float moveZ = Input.GetAxis("Vertical");
-
-        // Debug: Check input values
-        Debug.Log($"moveX: {moveX}, moveZ: {moveZ}");
-
-        // Calculate movement relative to camera's forward and right
-        Vector3 move = playerCamera.right * moveX + playerCamera.forward * moveZ;
-        move.y = 0; // Ensure movement is horizontal
-
-        controller.Move(move * speed * Time.deltaTime);
-
-        // Jump
         if (Input.GetButtonDown("Jump") && isGrounded)
         {
-            velocity.y = Mathf.Sqrt(jumpHeight * -2f * gravity);
-            Debug.Log("Jump!");
+            Jump();
+        }
+    }
+
+    void FixedUpdate()
+    {
+        // This is my gross solution to finding out the exact frame the player lands after a jump. I did my best leave me alone.
+        if (jumpStage == 1)
+        {
+            jumpStage = 2;
+        }
+        
+        GetMovement();
+
+        if (isGrounded)
+        {
+            if (moveDir != Vector3.zero)
+            {
+                //Turn();
+            }
+
+            if (velocity.y < 0)
+            {
+                velocity.y = 0;
+            }
         }
 
-        // Apply gravity
-        velocity.y += gravity * Time.deltaTime;
-        controller.Move(velocity * Time.deltaTime);
+        // Moves player according to movement direction
+        cc.Move(moveDir * Time.deltaTime);
+        InstantTurn();
+        // Applies gravity to player
+        velocity.y += gravityBase * Time.deltaTime;
+        cc.Move(velocity * Time.deltaTime);
 
-        // Debug: Check velocity
-        Debug.Log($"Velocity Y: {velocity.y}");
+        isGrounded = cc.isGrounded;
+        if (isGrounded && jumpStage == 2)
+        {
+            StartCoroutine(JumpTimer());
+        }
+    }
+
+    void GetMovement()
+    {
+        // Get direction camera is facing
+        Vector3 forward = camPos.TransformDirection(Vector3.forward);
+        Vector3 right = camPos.TransformDirection(Vector3.right);
+
+        // Get player inputs, combine with camera direction to get base direction of movement
+        bool isSlow = Input.GetKey(KeyCode.LeftShift) || !isGrounded;
+        float curSpeedX = canMove ? Input.GetAxis("Vertical") : 0;
+        float curSpeedZ = canMove ? Input.GetAxis("Horizontal") : 0;
+        moveDir = (forward * curSpeedX + right * curSpeedZ);
+
+        // Normalize movement if it exceeds a magnitude of 1 (prevents speed bug when moving diagonally)
+        if (moveDir.sqrMagnitude > 1f)
+        {
+            moveDir.Normalize();
+        }
+
+        // Apply either run or slow speed, slow speed is used for moving while jumping
+        moveSpeed = isSlow ? Mathf.Lerp(moveSpeed, slowSpeed, 0.12f) : Mathf.Lerp(moveSpeed, runSpeed, 0.12f);
+        moveDir *= moveSpeed;
+    }
+
+    // Ensures player smoothly turns to face the direction they're moving in
+    void Turn()
+    {
+        Quaternion lookDir = Quaternion.LookRotation(moveDir);
+        transform.rotation = Quaternion.Lerp(transform.rotation, lookDir, Time.deltaTime * turnSpeed);
+    }
+
+    // Faces the player in the direction they're moving in immediately, used for jumping
+    void InstantTurn()
+    {
+        if (moveDir != Vector3.zero)
+        {
+            transform.rotation = Quaternion.LookRotation(moveDir);
+        }
+    }
+
+    // Adjusts player's y-value to jump, also tracks number of jumps for triple jump
+    void Jump()
+    {
+        InstantTurn();
+        velocity.y += Mathf.Sqrt(jumpPower[jumps] * -2.0f * gravityBase);
+
+        jumps++;
+        if (jumps >= maxJumps)
+        {
+            jumps = 0;
+        }
+
+        jumpStage = 1;
+    }
+
+    // Tracks how long the player has been on the ground since last jump, needed for triple jump
+    IEnumerator JumpTimer()
+    {
+        jumpStage = 0;
+
+        yield return new WaitForSeconds(0.33f);
+
+        if (isGrounded)
+        {
+            jumps = 0;
+        }
     }
 }
-
