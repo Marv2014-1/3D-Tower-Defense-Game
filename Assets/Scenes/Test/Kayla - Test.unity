@@ -135,6 +135,14 @@ PrefabInstance:
       value: ArcheryTower
       objectReference: {fileID: 0}
     - target: {fileID: 2829424587664641172, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
+      propertyPath: range
+      value: 100
+      objectReference: {fileID: 0}
+    - target: {fileID: 2829424587664641172, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
+      propertyPath: cooldown
+      value: 1000
+      objectReference: {fileID: 0}
+    - target: {fileID: 2829424587664641172, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
       propertyPath: arrowPrefab
       value: 
       objectReference: {fileID: 4394720975334778653, guid: e3d5b40166e9b714785b089d8169c3ff, type: 3}
@@ -245,6 +253,11 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 446810553}
   m_Mesh: {fileID: -4225077782672720754, guid: 33bf76a8b7e195f4da55c04787719ff9, type: 3}
+--- !u!4 &446810558 stripped
+Transform:
+  m_CorrespondingSourceObject: {fileID: 5721273000184028032, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
+  m_PrefabInstance: {fileID: 446810552}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &505894890
 GameObject:
   m_ObjectHideFlags: 0
@@ -350,8 +363,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: a9f487b9f55d33640abc7042d2119213, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  playerBody: {fileID: 0}
-  compass: {fileID: 0}
+  playerBody: {fileID: 446810558}
+  compass: {fileID: 446810558}
   speed: 0.25
   lookSpeed: 0.25
   lookXLimit: 7.5
@@ -502,7 +515,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ba997dea8a17524ebcb0d65eb26b55f, type: 3}
       propertyPath: m_LocalPosition.x
-      value: -39
+      value: -19.5
       objectReference: {fileID: 0}
     - target: {fileID: -8679921383154817045, guid: 2ba997dea8a17524ebcb0d65eb26b55f, type: 3}
       propertyPath: m_LocalPosition.y
@@ -757,7 +770,7 @@ PrefabInstance:
       addedObject: {fileID: 1092771693}
     - targetCorrespondingSourceObject: {fileID: 919132149155446097, guid: 2ba997dea8a17524ebcb0d65eb26b55f, type: 3}
       insertIndex: -1
-      addedObject: {fileID: 1092771695}
+      addedObject: {fileID: 1092771697}
   m_SourcePrefab: {fileID: 100100000, guid: 2ba997dea8a17524ebcb0d65eb26b55f, type: 3}
 --- !u!1 &1092771692 stripped
 GameObject:
@@ -776,8 +789,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 2c80619a5c553094c98fb0de04407202, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
---- !u!64 &1092771695
-MeshCollider:
+--- !u!135 &1092771697
+SphereCollider:
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -794,10 +807,9 @@ MeshCollider:
   m_IsTrigger: 0
   m_ProvidesContacts: 0
   m_Enabled: 1
-  serializedVersion: 5
-  m_Convex: 0
-  m_CookingOptions: 30
-  m_Mesh: {fileID: 0}
+  serializedVersion: 3
+  m_Radius: 1.42699
+  m_Center: {x: 0, y: 0.92699003, z: 0}
 --- !u!1001 &1132166610
 PrefabInstance:
   m_ObjectHideFlags: 0

@@ -30,7 +30,7 @@ public class Arrow : MonoBehaviour //Modified from RS
     private void Update()
     {
         // Move the arrow forward in the direction it's facing
-        transform.Translate(Vector3.right * speed * Time.deltaTime);
+        transform.Translate(Vector3.down * speed * Time.deltaTime, Space.Self);
 
         // Destroy the arrow after it has traveled the specified range
         if (Vector3.Distance(startPosition, transform.position) >= range)

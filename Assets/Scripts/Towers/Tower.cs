@@ -6,15 +6,18 @@ public abstract class Tower : MonoBehaviour
 {
     public int damage;
     public float range;
-    public float cooldown; //time between firing
     public LayerMask enemyLayerMask; // Layer mask to identify enemies
     public float rotationSpeed = 5f;
-    private Enemy closestEnemy;  
+    public Enemy closestEnemy;
+    public bool onCooldown; //true if tower has fired too recently
+    public int cooldown; //time between firing
+    private int timeCooling;
 
     // Start is called before the first frame update
     void Start()
     {
-        
+        onCooldown = false;
+        timeCooling = 0;
     }
 
     // Update is called once per frame
@@ -22,13 +25,29 @@ public abstract class Tower : MonoBehaviour
     {
         UpdateClosestEnemy();
         RotateTowardsClosestEnemy();
-        Attack();
+
+        if (!onCooldown)
+        {
+            Attack();
+            onCooldown = true;
+        }
+        else
+        {
+            timeCooling++;
+            if (timeCooling >= cooldown)
+            {
+                onCooldown = false;
+                timeCooling = 0;
+            }
+        }
+
+        //Attack();
     }
 
     // This method will be implemented by each specific tower type
     public abstract void Attack();
 
-    private void UpdateClosestEnemy() //borrowed from RS, then modified 
+    public void UpdateClosestEnemy() //borrowed from RS, then modified 
     {
         // Find all enemies within range
         Collider[] hitEnemies = Physics.OverlapSphere(this.transform.position, range, enemyLayerMask); //change from 2D
@@ -44,9 +63,9 @@ public abstract class Tower : MonoBehaviour
         float closestDistance = Mathf.Infinity;
         Enemy nearest = null;
 
-        foreach (SphereCollider enemyCollider in hitEnemies)
+        foreach (Collider enemyCollider in hitEnemies)
         {
-            float distance = Vector2.Distance(this.transform.position, enemyCollider.transform.position);
+            float distance = Vector3.Distance(transform.position, enemyCollider.transform.position);
             if (distance < closestDistance)
             {
                 closestDistance = distance;
@@ -55,17 +74,24 @@ public abstract class Tower : MonoBehaviour
         }
 
         closestEnemy = nearest;
+        
     }
-    private void RotateTowardsClosestEnemy() //from RS
+    public void RotateTowardsClosestEnemy() 
     {
         if (closestEnemy == null)
             return;
 
-        Vector2 direction = closestEnemy.transform.position - transform.position;
-        float angle = Mathf.Atan2(direction.y, direction.x) * Mathf.Rad2Deg;
+        // Calculate direction to the closest enemy
+        Vector3 direction = closestEnemy.transform.position - transform.position;
+        direction.y = 0; // Lock vertical movement (only rotate around Y-axis)
 
-        // Adjust the angle based on your bow's sprite orientation if needed 
-        Quaternion targetRotation = Quaternion.Euler(new Vector3(0, 0, angle));
-        transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        if (direction != Vector3.zero)
+        {
+            // Calculate target rotation
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+
+            // Smoothly rotate towards the target rotation
+            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+        }
     }
 }
