@@ -6,6 +6,7 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private CharacterController cc;
+    private Animator anim;
     public Transform camPos;
     public Vector3 moveDir = Vector3.zero,
         velocity;
@@ -21,6 +22,7 @@ public class PlayerMovement : MonoBehaviour
     void Start()
     {
         cc = GetComponent<CharacterController>();
+        anim = GetComponentInChildren<Animator>();
         moveSpeed = runSpeed;
     }
 
@@ -31,6 +33,7 @@ public class PlayerMovement : MonoBehaviour
             if (isGrounded)
             {
                 Jump();
+                anim.SetBool("isGrounded", false);
             } 
             else
             {
@@ -41,6 +44,15 @@ public class PlayerMovement : MonoBehaviour
         if (Input.GetButtonUp("Jump") && holdJump)
         {
             holdJump = false;
+        }
+
+        if (Input.GetAxis("Vertical") == 0 && Input.GetAxis("Horizontal") == 0)
+        {
+            anim.SetBool("isMoving", false);
+        }
+        else
+        {
+            anim.SetBool("isMoving", true);
         }
     }
 
@@ -85,6 +97,7 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded && jumpStage == 2)
         {
             StartCoroutine(JumpTimer());
+            anim.SetBool("isGrounded", true);
             dive = false;
             diveMulti = 1.0f;
         }
@@ -165,12 +178,14 @@ public class PlayerMovement : MonoBehaviour
         if (isGrounded && velocity.y < 0 || launch) // Player is on the ground
         {
             velocity.y = Physics.gravity.y * Time.deltaTime;
+            anim.SetBool("isFalling", false);
             return;
         }
 
         if (velocity.y < 0) // Player is falling after apex of jump
         {
             velocity.y += Physics.gravity.y * (highGravityScale - 1) * Time.deltaTime;
+            anim.SetBool("isFalling", true);
         } 
         else if (velocity.y > 0 && !holdJump) // Player is jumping but let go of jump button
         {

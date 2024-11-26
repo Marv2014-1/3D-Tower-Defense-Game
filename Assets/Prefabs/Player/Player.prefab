@@ -2178,6 +2178,7 @@ GameObject:
   serializedVersion: 6
   m_Component:
   - component: {fileID: 1950590147515054197}
+  - component: {fileID: 4342933659419606303}
   m_Layer: 0
   m_Name: Rogue
   m_TagString: Untagged
@@ -2207,6 +2208,27 @@ Transform:
   - {fileID: 2496106066658935924}
   m_Father: {fileID: 8718102423232949854}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!95 &4342933659419606303
+Animator:
+  serializedVersion: 5
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 7162932369184657165}
+  m_Enabled: 1
+  m_Avatar: {fileID: 0}
+  m_Controller: {fileID: 9100000, guid: 6930c0768e43a6843b76581a295eb144, type: 2}
+  m_CullingMode: 0
+  m_UpdateMode: 0
+  m_ApplyRootMotion: 0
+  m_LinearVelocityBlending: 0
+  m_StabilizeFeet: 0
+  m_WarningMessage: 
+  m_HasTransformHierarchy: 1
+  m_AllowConstantClipSamplingOptimization: 1
+  m_KeepAnimatorStateOnDisable: 0
+  m_WriteDefaultValuesOnDisable: 0
 --- !u!1 &7680264169146935970
 GameObject:
   m_ObjectHideFlags: 0
@@ -2406,18 +2428,25 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   camPos: {fileID: 0}
+  moveDir: {x: 0, y: 0, z: 0}
+  velocity: {x: 0, y: 0, z: 0}
   slowSpeed: 6
   runSpeed: 15
   moveSpeed: 0
   turnSpeed: 2
   jumpTimer: 100
-  gravityScale: 1
-  gravityBase: -9.81
+  jumpCut: 0.025
+  divePower: 2.5
+  launchPower: 0
+  highGravityScale: 2.5
+  lowGravityScale: 2
   jumpPower:
   - 3
   - 5
   - 7.5
   isGrounded: 0
+  holdJump: 0
+  launch: 0
 --- !u!1 &8355394454615537541
 GameObject:
   m_ObjectHideFlags: 0
