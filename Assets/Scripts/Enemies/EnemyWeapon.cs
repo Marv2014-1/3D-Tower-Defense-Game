@@ -21,18 +21,18 @@ public class EnemyWeapon : MonoBehaviour
 
     private void OnTriggerEnter(Collider collision)
     {
-        if (collision.CompareTag("Ally") || collision.CompareTag("Player")) // Replace with appropriate target tags
-        {
-            Debug.Log($"{collision.name} hit by weapon!");
+        // if (collision.CompareTag("Ally") || collision.CompareTag("Player")) // Replace with appropriate target tags
+        // {
+        //     Debug.Log($"{collision.name} hit by weapon!");
 
-            // Apply damage to the target
-            IDamageable damageable = collision.GetComponent<IDamageable>();
-            if (damageable != null)
-            {
-                Vector3 knockbackDirection = (collision.transform.position - transform.position).normalized;
-                damageable.TakeDamage(damage, knockbackDirection, knockbackForce);
-            }
-        }
+        //     // Apply damage to the target
+        //     IDamageable damageable = collision.GetComponent<IDamageable>();
+        //     if (damageable != null)
+        //     {
+        //         Vector3 knockbackDirection = (collision.transform.position - transform.position).normalized;
+        //         damageable.TakeDamage(damage, knockbackDirection, knockbackForce);
+        //     }
+        // }
     }
 
     public void ActivateWeapon()
