@@ -51,7 +51,7 @@ public class ArcheryTower : Tower
             arrow.SetSpeed(arrowSpeed);
             arrow.SetRange(arrowRange);
 
-            Debug.Log("Bow shot an arrow.");
+            Debug.Log("ArcheryTower shot an arrow.");
         }
         else
         {

@@ -21,7 +21,7 @@ public abstract class Tower : MonoBehaviour
     }
 
     // Update is called once per frame
-    void Update()
+    void Update()//unity coroutine timer? look at rs pause screen code
     {
         UpdateClosestEnemy();
         RotateTowardsClosestEnemy();
@@ -91,7 +91,7 @@ public abstract class Tower : MonoBehaviour
             Quaternion targetRotation = Quaternion.LookRotation(direction);
 
             // Smoothly rotate towards the target rotation
-            transform.rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            transform.Find("ProjectileSpawn").rotation = Quaternion.Lerp(transform.rotation, targetRotation, rotationSpeed * Time.deltaTime);
         }
     }
 }
