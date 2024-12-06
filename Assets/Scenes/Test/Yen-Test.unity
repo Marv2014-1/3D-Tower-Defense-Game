@@ -9275,6 +9275,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Skeleton_Minion
       objectReference: {fileID: 0}
+    - target: {fileID: 1739623006742310432, guid: 64aa84d3c3440ba4fb6d49461931b0b2, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 2055126717531979140, guid: 64aa84d3c3440ba4fb6d49461931b0b2, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: -46.043976
@@ -9682,8 +9686,30 @@ PrefabInstance:
     m_RemovedComponents: []
     m_RemovedGameObjects: []
     m_AddedGameObjects: []
-    m_AddedComponents: []
+    m_AddedComponents:
+    - targetCorrespondingSourceObject: {fileID: 5990010578666757268, guid: 64aa84d3c3440ba4fb6d49461931b0b2, type: 3}
+      insertIndex: -1
+      addedObject: {fileID: 1354170869161654677}
   m_SourcePrefab: {fileID: 100100000, guid: 64aa84d3c3440ba4fb6d49461931b0b2, type: 3}
+--- !u!1 &1354170869161654675 stripped
+GameObject:
+  m_CorrespondingSourceObject: {fileID: 5990010578666757268, guid: 64aa84d3c3440ba4fb6d49461931b0b2, type: 3}
+  m_PrefabInstance: {fileID: 1354170869161654673}
+  m_PrefabAsset: {fileID: 0}
+--- !u!114 &1354170869161654677
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1354170869161654675}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ee15a27b01798c944b66029d46132ab0, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  damage: 10
+  knockbackForce: 5
 --- !u!1001 &5784183843740688120
 PrefabInstance:
   m_ObjectHideFlags: 0

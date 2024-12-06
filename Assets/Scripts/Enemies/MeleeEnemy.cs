@@ -50,11 +50,11 @@ public class MeleeEnemy : Enemy
 
     private void PerformAttack()
     {
-        if (animator == null || weaponCollider == null) return;
+        // if (animator == null || weaponCollider == null) return;
 
-        canMove = false;
-        string attackTrigger = CheckAttackDirection();
-        Attack(attackTrigger, 0.1f, 0.3f); // Adjust activation/deactivation times as needed
+        // // canMove = false;
+        // string attackTrigger = CheckAttackDirection();
+        // Attack(attackTrigger, 0.1f, 0.3f); // Adjust activation/deactivation times as needed
     }
 
     private string CheckAttackDirection()
