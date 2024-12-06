@@ -41,6 +41,7 @@ public class Arrow : MonoBehaviour //Modified from RS
 
     private void OnTriggerEnter(Collider collision)
     {
+        Debug.Log($"Arrow collided with an object");
         // Check if the arrow hit an enemy
         if (collision.CompareTag("Enemy"))
         {
