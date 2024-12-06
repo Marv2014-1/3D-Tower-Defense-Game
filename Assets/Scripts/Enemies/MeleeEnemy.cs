@@ -7,64 +7,89 @@ public class MeleeEnemy : Enemy
     [Header("Attack Settings")]
     [SerializeField] private float attackRange = 3f;
     private float nextAttackTime = 0f;
+    [SerializeField] private float attackCooldown = 2f; // Adjust the cooldown value as needed
 
-    [SerializeField] private Hitbox hitbox;
+    [SerializeField] private GameObject enemyWeapon; // Reference to the weapon with the MeshCollider
+    private MeshCollider weaponCollider;
 
-    protected override void Update()
+    protected override void Awake()
+    {
+        base.Awake();
+        if (enemyWeapon != null)
+        {
+            weaponCollider = enemyWeapon.GetComponent<MeshCollider>();
+            if (weaponCollider != null)
+            {
+                weaponCollider.enabled = false; // Ensure the collider is initially disabled
+            }
+            else
+            {
+                Debug.LogError("EnemyWeapon must have a MeshCollider attached.");
+            }
+        }
+    }
+
+    protected void Update()
     {
         base.Update();
 
-        if (playerTransform == null) return;
+        if (targetTransform == null) return;
 
-        float distanceToPlayer = Vector3.Distance(transform.position, playerTransform.position);
+        float distanceToTarget = Vector3.Distance(transform.position, targetTransform.position);
 
-        if (distanceToPlayer <= attackRange && Time.time >= nextAttackTime)
+        if (distanceToTarget <= attackRange && Time.time >= nextAttackTime)
         {
             PerformAttack();
             nextAttackTime = Time.time + attackCooldown;
         }
         else
         {
-            MoveTowardsPlayer();
+            MoveTowardsTarget();
         }
     }
 
     private void PerformAttack()
     {
-        if (animator == null || hitbox == null) return;
+        if (animator == null || weaponCollider == null) return;
 
         canMove = false;
         string attackTrigger = CheckAttackDirection();
-        Attack(attackTrigger, 0.1f, 0.3f);
+        Attack(attackTrigger, 0.1f, 0.3f); // Adjust activation/deactivation times as needed
     }
 
     private string CheckAttackDirection()
     {
-        Vector3 directionToPlayer = playerTransform.position - transform.position;
-        if (Mathf.Abs(directionToPlayer.x) > Mathf.Abs(directionToPlayer.z))
+        Vector3 directionToTarget = targetTransform.position - transform.position;
+        if (Mathf.Abs(directionToTarget.x) > Mathf.Abs(directionToTarget.z))
         {
-            return directionToPlayer.x > 0 ? "TriggerAttackSide" : "TriggerAttackSide";
+            return directionToTarget.x > 0 ? "TriggerAttackSide" : "TriggerAttackSide";
         }
         else
         {
-            return directionToPlayer.z > 0 ? "TriggerAttackFront" : "TriggerAttackBack";
+            return directionToTarget.z > 0 ? "TriggerAttackFront" : "TriggerAttackBack";
         }
     }
 
     public void Attack(string triggerName, float activateTime, float deactivateTime)
     {
         animator.SetTrigger(triggerName);
-        Invoke(nameof(ActivateHitbox), activateTime);
-        Invoke(nameof(DeactivateHitbox), deactivateTime);
+        Invoke(nameof(ActivateWeapon), activateTime);
+        Invoke(nameof(DeactivateWeapon), deactivateTime);
     }
 
-    private void ActivateHitbox()
+    private void ActivateWeapon()
     {
-        hitbox?.ActivateHitbox();
+        if (weaponCollider != null)
+        {
+            weaponCollider.enabled = true;
+        }
     }
 
-    private void DeactivateHitbox()
+    private void DeactivateWeapon()
     {
-        hitbox?.DeactivateHitbox();
+        if (weaponCollider != null)
+        {
+            weaponCollider.enabled = false;
+        }
     }
 }

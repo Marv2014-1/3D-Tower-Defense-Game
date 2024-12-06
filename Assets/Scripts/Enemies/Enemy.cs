@@ -13,7 +13,7 @@ public abstract class Enemy : MonoBehaviour
     public float baseMoveSpeed = 2f;
     public float currentMoveSpeed;
     protected int currentHealth;
-    protected Transform playerTransform;
+    protected Transform targetTransform; // Changed from playerTransform to targetTransform
     protected Rigidbody rb;
     public bool canMove;
     public GameObject deathEffect;
@@ -25,15 +25,25 @@ public abstract class Enemy : MonoBehaviour
         currentMoveSpeed = baseMoveSpeed;
         canMove = true;
         rb = GetComponent<Rigidbody>();
-        playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
         animator = GetComponent<Animator>() ?? GetComponentInChildren<Animator>();
+        FindNearestAlly(); // Find the initial target
     }
+    protected float targetRefreshInterval = 1f; // Refresh interval
+    private float lastTargetRefreshTime = 0f;
 
+    protected void Update()
+    {
+        if (Time.time >= lastTargetRefreshTime + targetRefreshInterval)
+        {
+            FindNearestAlly();
+            lastTargetRefreshTime = Time.time;
+        }
+    }
     protected virtual void FixedUpdate()
     {
         if (canMove)
         {
-            MoveTowardsPlayer();
+            MoveTowardsTarget();
         }
         else
         {
@@ -41,15 +51,33 @@ public abstract class Enemy : MonoBehaviour
         }
     }
 
-    protected void MoveTowardsPlayer()
+    protected void MoveTowardsTarget()
     {
-        if (!canMove || playerTransform == null) return;
+        if (!canMove || targetTransform == null) return;
 
-        Vector3 direction = (playerTransform.position - transform.position).normalized;
+        Vector3 direction = (targetTransform.position - transform.position).normalized;
         Vector3 movement = direction * currentMoveSpeed * Time.fixedDeltaTime;
         rb.MovePosition(rb.position + movement);
     }
-    
+
+    protected void FindNearestAlly()
+    {
+        GameObject[] allies = GameObject.FindGameObjectsWithTag("Ally");
+        float shortestDistance = Mathf.Infinity;
+        GameObject nearestAlly = null;
+
+        foreach (GameObject ally in allies)
+        {
+            float distance = Vector3.Distance(transform.position, ally.transform.position);
+            if (distance < shortestDistance && distance <= detectionRadius)
+            {
+                shortestDistance = distance;
+                nearestAlly = ally;
+            }
+        }
+
+        targetTransform = nearestAlly?.transform;
+    }
 
     public virtual void TakeDamage(int damageAmount)
     {
