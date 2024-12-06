@@ -72,7 +72,7 @@ public class MeleeEnemy : Enemy
 
     public void Attack(string triggerName, float activateTime, float deactivateTime)
     {
-        animator.SetTrigger(triggerName);
+        // animator.SetTrigger(triggerName);
         Invoke(nameof(ActivateWeapon), activateTime);
         Invoke(nameof(DeactivateWeapon), deactivateTime);
     }
