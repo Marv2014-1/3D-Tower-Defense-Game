@@ -10,7 +10,7 @@ GameObject:
   m_Component:
   - component: {fileID: 8759406016147950902}
   m_Layer: 0
-  m_Name: ArrowSpawn
+  m_Name: ProjectileSpawn
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0

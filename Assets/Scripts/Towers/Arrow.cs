@@ -39,8 +39,9 @@ public class Arrow : MonoBehaviour //Modified from RS
         }
     }
 
-    private void OnTriggerEnter2D(Collider2D collision)
+    private void OnTriggerEnter(Collider collision)
     {
+        Debug.Log($"Arrow collided with an object");
         // Check if the arrow hit an enemy
         if (collision.CompareTag("Enemy"))
         {
@@ -51,9 +52,12 @@ public class Arrow : MonoBehaviour //Modified from RS
                 //enemy.TakeDamage(damage);
                 Debug.Log($"Arrow hit {enemy.gameObject.name} and dealt {damage} damage.");
             }
-
-            // Destroy the arrow
-            Destroy(gameObject);
         }
+        else
+        {
+            Debug.Log($"Arrow missed Enemy.");
+        }
+        // Destroy the arrow
+        Destroy(gameObject);
     }
 }
