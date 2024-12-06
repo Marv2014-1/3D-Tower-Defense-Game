@@ -28,9 +28,9 @@ public class ArcheryTower : Tower
     {
         if (closestEnemy == null)
             return;
-
+        Vector3 offset = new Vector3(0, 2, 0);
         // Calculate the direction from the spawn point to the closest enemy
-        Vector3 direction = (closestEnemy.transform.position - arrowSpawnPoint.position).normalized;
+        Vector3 direction = (closestEnemy.transform.position - arrowSpawnPoint.position + offset).normalized;
 
         // Instantiate the arrow
         GameObject arrowInstance = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.identity);

@@ -19,8 +19,16 @@ public class Bomb : MonoBehaviour
 
     // Update is called once per frame
     void Update()
-    {
-        
+    { //maybe should be changed to travel in an arc but math hard
+
+        // Move the bomb forward in the direction it's facing
+        transform.Translate(Vector3.down * speed * Time.deltaTime, Space.Self);
+
+        // Destroy the bomb after it has traveled the specified range
+        if (Vector3.Distance(startPosition, transform.position) >= range)
+        {
+            Destroy(gameObject);
+        }
     }
 
     private void OnTriggerEnter(Collider collision)
@@ -32,5 +40,7 @@ public class Bomb : MonoBehaviour
             Enemy enemy = hitEnemies[i].GetComponent<Enemy>();
             //enemy.TakeDamage(damage);
         }
+
+        Destroy(gameObject);
     }
 }

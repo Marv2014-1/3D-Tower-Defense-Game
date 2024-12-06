@@ -83,7 +83,7 @@ public abstract class Tower : MonoBehaviour
 
         // Calculate direction to the closest enemy
         Vector3 direction = closestEnemy.transform.position - transform.position;
-        direction.y = 0; // Lock vertical movement (only rotate around Y-axis)
+        //direction.y = 0; // Lock vertical movement (only rotate around Y-axis)
 
         if (direction != Vector3.zero)
         {
