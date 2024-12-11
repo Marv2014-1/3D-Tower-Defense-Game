@@ -7,7 +7,7 @@ public class MeleeEnemy : Enemy
     [Header("Attack Settings")]
     [SerializeField] private float attackRange = 3f;
     private float nextAttackTime = 0f;
-    [SerializeField] private float attackCooldown = 2f; // Adjust the cooldown value as needed
+    [SerializeField] private float attackCooldown = 2f; // Cooldown between attacks
 
     [SerializeField] private GameObject enemyWeapon; // Reference to the weapon with the MeshCollider
     private MeshCollider weaponCollider;
@@ -33,48 +33,50 @@ public class MeleeEnemy : Enemy
     {
         base.Update();
 
-        if (targetTransform == null) return;
+        if (currentHealth <= 0) return;
 
-        float distanceToTarget = Vector3.Distance(transform.position, targetTransform.position);
-
-        if (distanceToTarget <= attackRange && Time.time >= nextAttackTime)
+        // Simulate an attack on a nearby target (replace with actual target detection logic)
+        Transform target = DetectTarget();
+        if (target != null && Time.time >= nextAttackTime)
         {
             PerformAttack();
             nextAttackTime = Time.time + attackCooldown;
         }
-        else
+    }
+
+    private Transform DetectTarget()
+    {
+        // Placeholder logic for detecting a target within attack range
+        Collider[] hitColliders = Physics.OverlapSphere(transform.position, attackRange);
+        foreach (var hitCollider in hitColliders)
         {
-            MoveTowardsTarget();
+            if (hitCollider.CompareTag("Player")) // Replace with your target tag
+            {
+                return hitCollider.transform;
+            }
         }
+        return null;
     }
 
     private void PerformAttack()
     {
-        // if (animator == null || weaponCollider == null) return;
+        int attackType = Random.Range(1, 4); // Randomly choose between IsAttack1, IsAttack2, IsAttack3
 
-        // // canMove = false;
-        // string attackTrigger = CheckAttackDirection();
-        // Attack(attackTrigger, 0.1f, 0.3f); // Adjust activation/deactivation times as needed
-    }
-
-    private string CheckAttackDirection()
-    {
-        Vector3 directionToTarget = targetTransform.position - transform.position;
-        if (Mathf.Abs(directionToTarget.x) > Mathf.Abs(directionToTarget.z))
+        switch (attackType)
         {
-            return directionToTarget.x > 0 ? "TriggerAttackSide" : "TriggerAttackSide";
+            case 1:
+                animator.SetTrigger("IsAttack1");
+                break;
+            case 2:
+                animator.SetTrigger("IsAttack2");
+                break;
+            case 3:
+                animator.SetTrigger("IsAttack3");
+                break;
         }
-        else
-        {
-            return directionToTarget.z > 0 ? "TriggerAttackFront" : "TriggerAttackBack";
-        }
-    }
 
-    public void Attack(string triggerName, float activateTime, float deactivateTime)
-    {
-        // animator.SetTrigger(triggerName);
-        Invoke(nameof(ActivateWeapon), activateTime);
-        Invoke(nameof(DeactivateWeapon), deactivateTime);
+        ActivateWeapon();
+        Invoke(nameof(DeactivateWeapon), 0.5f); // Adjust activation duration as needed
     }
 
     private void ActivateWeapon()
