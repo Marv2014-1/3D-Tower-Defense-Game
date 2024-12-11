@@ -1,11 +1,18 @@
 using UnityEngine;
 
-public class Arrow : MonoBehaviour //Modified from RS
+public class Arrow : MonoBehaviour
 {
     private int damage;
     private float speed;
     private float range;
     private Vector3 startPosition;
+    private Rigidbody rb;
+    private Enemy target;
+    public float homingStrength = 2f;
+
+    // References to the tip and tail
+    public Transform tip;
+    public Transform tail;
 
     public void SetDamage(int damageAmount)
     {
@@ -22,17 +29,47 @@ public class Arrow : MonoBehaviour //Modified from RS
         range = rangeAmount;
     }
 
+    public void SetTarget(Enemy enemyTarget)
+    {
+        target = enemyTarget;
+    }
+
     private void Start()
     {
         startPosition = transform.position;
+        rb = GetComponent<Rigidbody>();
+        if (rb == null)
+        {
+            rb = gameObject.AddComponent<Rigidbody>();
+        }
+        rb.isKinematic = true;
+
+        Collider col = GetComponent<Collider>();
+        if (!col)
+        {
+            col = gameObject.AddComponent<BoxCollider>();
+        }
+        col.isTrigger = true;
     }
 
     private void Update()
     {
-        // Move the arrow forward in the direction it's facing
-        transform.Translate(Vector3.down * speed * Time.deltaTime, Space.Self);
+        if (target != null)
+        {
+            // Calculate direction from arrow's position to target
+            Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
 
-        // Destroy the arrow after it has traveled the specified range
+            // Determine the target rotation
+            Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
+
+            // Smoothly rotate towards the target
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * homingStrength);
+        }
+
+        // Move the arrow forward in its local space
+        transform.Translate(Vector3.forward * speed * Time.deltaTime, Space.Self);
+
+        // Destroy the arrow if it exceeds its range
         if (Vector3.Distance(startPosition, transform.position) >= range)
         {
             Destroy(gameObject);
@@ -41,23 +78,14 @@ public class Arrow : MonoBehaviour //Modified from RS
 
     private void OnTriggerEnter(Collider collision)
     {
-        Debug.Log("Arrow collided with an object");
-        // Check if the arrow hit an enemy
         if (collision.CompareTag("Enemy"))
         {
             Enemy enemy = collision.GetComponent<Enemy>();
-
             if (enemy != null)
             {
-                //enemy.TakeDamage(damage);
-                Debug.Log($"Arrow hit {enemy.gameObject.name} and dealt {damage} damage.");
+                enemy.TakeDamage(damage);
+                Destroy(gameObject);
             }
         }
-        else
-        {
-            Debug.Log("Arrow missed Enemy.");
-        }
-        // Destroy the arrow
-        Destroy(gameObject);
     }
 }

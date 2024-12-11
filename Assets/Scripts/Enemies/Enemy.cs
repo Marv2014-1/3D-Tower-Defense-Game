@@ -4,8 +4,9 @@ using UnityEngine;
 public class Enemy : MonoBehaviour
 {
     [Header("Enemy Attributes")]
-    public int maxHealth = 100;
+    public int maxHealth = 20;
     public float moveSpeed = 2f;
+    public float rotationSpeed = 360f; // Degrees per second for rotation
 
     [Header("Waypoints")]
     public Transform[] waypoints;
@@ -53,7 +54,18 @@ public class Enemy : MonoBehaviour
         bool isMoving = direction.magnitude > 0.1f;
         animator.SetBool("IsWalking", isMoving);
 
-        rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
+        if (isMoving)
+        {
+            // Calculate target rotation towards the direction
+            Quaternion targetRotation = Quaternion.LookRotation(direction);
+            
+            // Smoothly rotate towards the target rotation
+            Quaternion newRotation = Quaternion.RotateTowards(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
+            rb.MoveRotation(newRotation);
+
+            // Move the enemy towards the waypoint
+            rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
+        }
 
         // Check if close enough to waypoint to move to the next
         if (Vector3.Distance(transform.position, targetWaypoint.position) < 0.5f)
@@ -111,4 +123,10 @@ public class Enemy : MonoBehaviour
 
         Destroy(gameObject, 2f); // Wait for death animation before destroying
     }
+
+    public bool IsDead()
+    {
+        return isDead;
+    }
+
 }

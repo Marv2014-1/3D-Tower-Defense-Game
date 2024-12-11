@@ -129,8 +129,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e296a007d8ccc049aa6895247169905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 0
-  range: 0
+  damage: 10
+  range: 100
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 64
@@ -139,9 +139,8 @@ MonoBehaviour:
   onCooldown: 0
   cooldown: 1000
   arrowPrefab: {fileID: 4394720975334778653, guid: e3d5b40166e9b714785b089d8169c3ff, type: 3}
-  arrowSpawnPoint: {fileID: 8759406016147950902}
-  arrowSpeed: 10
-  arrowRange: 30
+  arrowSpeed: 50
+  arrowRange: 100
 --- !u!1 &4801843314385818936
 GameObject:
   m_ObjectHideFlags: 0
