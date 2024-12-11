@@ -11,7 +11,7 @@ public abstract class Tower : MonoBehaviour
     public Enemy closestEnemy;
     public bool onCooldown; //true if tower has fired too recently
     public int cooldown; //time between firing
-    private int timeCooling;
+    private int timeCooling = 0;
 
     // Start is called before the first frame update
     void Start()

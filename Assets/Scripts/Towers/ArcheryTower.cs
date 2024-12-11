@@ -6,15 +6,20 @@ public class ArcheryTower : Tower
 {
     [Header("Arrow Settings")]
     public GameObject arrowPrefab; // Assign the Arrow prefab in the Inspector
-    public Transform arrowSpawnPoint; // Assign the spawn point in the Inspector
+    private Transform arrowSpawnPoint; 
     public float arrowSpeed = 10f;
     public float arrowRange = 20f;
 
 
     // Start is called before the first frame update
-    //void Start()
-    //{
-    //}
+    void Start()
+    {
+        arrowSpawnPoint = transform.Find("ProjectileSpawn");
+        cooldown = 500;
+        range = 30;
+        onCooldown = false;
+        enemyLayerMask = LayerMask.GetMask("Enemy");
+    }
 
     //Update is called once per frame
     /*void Update()
