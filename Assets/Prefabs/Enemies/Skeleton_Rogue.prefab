@@ -481,6 +481,10 @@ PrefabInstance:
       propertyPath: m_Name
       value: Skeleton_Rogue
       objectReference: {fileID: 0}
+    - target: {fileID: 919132149155446097, guid: 0d602dd9bd40dae4fa7a47f60c6a496f, type: 3}
+      propertyPath: m_TagString
+      value: Enemy
+      objectReference: {fileID: 0}
     - target: {fileID: 2196004506624635508, guid: 0d602dd9bd40dae4fa7a47f60c6a496f, type: 3}
       propertyPath: m_LocalEulerAnglesHint.x
       value: 0.00000026087207
