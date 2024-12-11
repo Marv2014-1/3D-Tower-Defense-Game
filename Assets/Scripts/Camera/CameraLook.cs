@@ -24,7 +24,7 @@ public class CameraLook : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.M))
+        if (Input.GetKeyDown(KeyCode.R))
         {
             SwitchCam();
         }
