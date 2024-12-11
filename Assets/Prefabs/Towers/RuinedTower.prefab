@@ -82,7 +82,6 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   towerPrefab: {fileID: 2022378775009854137, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
   arrowPrefab: {fileID: 4394720975334778653, guid: e3d5b40166e9b714785b089d8169c3ff, type: 3}
-  arrowSpawnPoint: {fileID: 0}
 --- !u!135 &8093546045769408005
 SphereCollider:
   m_ObjectHideFlags: 0
@@ -98,7 +97,7 @@ SphereCollider:
     serializedVersion: 2
     m_Bits: 0
   m_LayerOverridePriority: 0
-  m_IsTrigger: 0
+  m_IsTrigger: 1
   m_ProvidesContacts: 0
   m_Enabled: 1
   serializedVersion: 3

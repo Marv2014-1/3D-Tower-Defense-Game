@@ -13,7 +13,7 @@ public class Story : MonoBehaviour
     {
         if (Input.GetKeyDown(KeyCode.Space))
         {
-            SceneManager.LoadScene(sceneName: "Brandon-Test");
+            SceneManager.LoadScene(sceneName: "Game");
         }
 
         float newY = Mathf.Sin(Time.time * speed) * height;

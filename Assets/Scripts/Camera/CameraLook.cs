@@ -8,8 +8,8 @@ public class CameraLook : MonoBehaviour
     public Transform compass;
     private Vector3 targetPos,
         offsetPos = new Vector3(0, 2.75f, 0),
-        mapCamPos = new Vector3(0, 200, -85),
-        mapCamAng = new Vector3(70, 0, 0);
+        mapCamPos = new Vector3(150, 400, 5),
+        mapCamAng = new Vector3(90, 0, 0);
     public float speed = 0.25f;
     public float turnSpeed = 2f;
     private bool mapCam = false;

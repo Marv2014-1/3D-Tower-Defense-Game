@@ -70,7 +70,7 @@ public class PlayerMovement : MonoBehaviour
 
             if (dive)
             {
-                Dive();
+                // Dive();
             }
         }
         else
