@@ -1,126 +1,114 @@
 using UnityEngine;
-using System.Collections;
 
 [RequireComponent(typeof(Rigidbody))]
 public class Enemy : MonoBehaviour
 {
-    [Header("General Settings")]
+    [Header("Enemy Attributes")]
     public int maxHealth = 100;
     public float moveSpeed = 2f;
-    public float attackRange = 2f;
 
-    [Header("Path Settings")]
+    [Header("Waypoints")]
     public Transform[] waypoints;
     private int currentWaypointIndex = 0;
 
+    private Rigidbody rb;
+    protected Animator animator; // Allow access in child classes
     protected int currentHealth;
-    protected Rigidbody rb;
-    protected Transform targetTransform;
-    private bool isAttacking = false;
+
+    private bool isDead = false; // Ensure actions stop after death
 
     protected virtual void Awake()
     {
-        currentHealth = maxHealth;
         rb = GetComponent<Rigidbody>();
+        animator = GetComponent<Animator>();
+        currentHealth = maxHealth;
     }
 
     protected virtual void Update()
     {
-        if (isAttacking) return;
+        if (isDead) return; // Stop all actions if the enemy is dead
 
-        // Prioritize attacking nearby allies
-        if (FindNearestTarget("Ally"))
+        if (currentHealth <= 0)
         {
-            MoveTowardsTarget();
+            PlayDeathAnimation();
+            return;
         }
-        // Otherwise, follow the path toward the castle
-        else if (currentWaypointIndex < waypoints.Length)
+
+        if (currentWaypointIndex < waypoints.Length)
         {
             FollowPath();
         }
+        else
+        {
+            ReachedEndOfPath();
+        }
     }
 
-    protected bool FindNearestTarget(string tag)
+    private void FollowPath()
     {
-        GameObject[] targets = GameObject.FindGameObjectsWithTag(tag);
-        GameObject nearestTarget = null;
-        float shortestDistance = Mathf.Infinity;
+        Transform targetWaypoint = waypoints[currentWaypointIndex];
+        Vector3 direction = (targetWaypoint.position - transform.position).normalized;
 
-        foreach (GameObject target in targets)
-        {
-            float distance = Vector3.Distance(transform.position, target.transform.position);
-            if (distance < shortestDistance && distance <= attackRange)
-            {
-                shortestDistance = distance;
-                nearestTarget = target;
-            }
-        }
+        // Enable IsWalking animation if moving
+        bool isMoving = direction.magnitude > 0.1f;
+        animator.SetBool("IsWalking", isMoving);
 
-        if (nearestTarget != null)
-        {
-            targetTransform = nearestTarget.transform;
-            isAttacking = true;
-            StartCoroutine(AttackTarget());
-            return true;
-        }
-
-        targetTransform = null;
-        return false;
-    }
-
-    protected void FollowPath()
-    {
-        Transform waypoint = waypoints[currentWaypointIndex];
-        Vector3 direction = (waypoint.position - transform.position).normalized;
         rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
 
-        // Move to the next waypoint if close enough
-        if (Vector3.Distance(transform.position, waypoint.position) < 0.5f)
+        // Check if close enough to waypoint to move to the next
+        if (Vector3.Distance(transform.position, targetWaypoint.position) < 0.5f)
         {
             currentWaypointIndex++;
         }
     }
 
-    protected IEnumerator AttackTarget()
+    private void ReachedEndOfPath()
     {
-        while (isAttacking && targetTransform != null)
-        {
-            // Perform the attack (add your damage logic here)
-            Debug.Log($"Attacking {targetTransform.name}");
-            yield return new WaitForSeconds(1f); // Delay between attacks
-        }
-
-        isAttacking = false;
+        // Custom behavior when the enemy reaches the final waypoint
+        Destroy(gameObject);
+        WaveSpawner.EnemiesAlive--;
     }
 
-    protected void MoveTowardsTarget()
+    public void TakeDamage(int damage)
     {
-        if (targetTransform == null) return;
+        if (isDead || currentHealth <= 0) return;
 
-        Vector3 direction = (targetTransform.position - transform.position).normalized;
-        rb.MovePosition(rb.position + direction * moveSpeed * Time.deltaTime);
-    }
-
-    protected virtual void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Castle"))
-        {
-            Debug.Log("Enemy reached the castle! Game over.");
-            // Implement game-over logic here
-        }
-    }
-
-    public virtual void TakeDamage(int damage)
-    {
         currentHealth -= damage;
+        animator.SetBool("IsHurting", true);
+
+        Invoke(nameof(StopHurtAnimation), 0.5f); // Stop hurting animation after a short delay
+
         if (currentHealth <= 0)
         {
-            Die();
+            PlayDeathAnimation();
         }
     }
 
-    protected virtual void Die()
+    private void StopHurtAnimation()
     {
-        Destroy(gameObject);
+        if (!isDead)
+        {
+            animator.SetBool("IsHurting", false);
+        }
+    }
+
+    private void PlayDeathAnimation()
+    {
+        if (isDead) return;
+
+        isDead = true; // Mark the enemy as dead
+        animator.SetBool("IsDead", true);
+
+        // Disable movement and other components during death
+        rb.isKinematic = true;
+
+        // Optionally, remove the collider to prevent interactions
+        Collider collider = GetComponent<Collider>();
+        if (collider != null)
+        {
+            collider.enabled = false;
+        }
+
+        Destroy(gameObject, 2f); // Wait for death animation before destroying
     }
 }
