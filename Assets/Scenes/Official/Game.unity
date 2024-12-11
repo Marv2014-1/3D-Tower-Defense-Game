@@ -307,6 +307,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5664231204983354500, guid: d24ef8c115ef8954092c1595d0f62837, type: 3}
+      propertyPath: field of view
+      value: 40
+      objectReference: {fileID: 0}
     - target: {fileID: 5959527194901115822, guid: d24ef8c115ef8954092c1595d0f62837, type: 3}
       propertyPath: playerBody
       value: 
@@ -1907,6 +1911,10 @@ PrefabInstance:
     serializedVersion: 3
     m_TransformParent: {fileID: 0}
     m_Modifications:
+    - target: {fileID: 5193123660249667320, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
+      propertyPath: m_IsActive
+      value: 0
+      objectReference: {fileID: 0}
     - target: {fileID: 5497663404550559263, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
       propertyPath: m_Name
       value: UI
