@@ -6,71 +6,100 @@ using UnityEngine;
 public class PlayerMovement : MonoBehaviour
 {
     private CharacterController cc;
+    private Animator anim;
     public Transform camPos;
-    private Vector3 moveDir = Vector3.zero,
+    public Vector3 moveDir = Vector3.zero,
         velocity;
-    public float slowSpeed = 6f,
-        runSpeed = 15f,
-        moveSpeed,
-        turnSpeed = 0.1f,
-        jumpTimer = 0.5f,
-        gravityScale = 1.0f,
-        gravityBase = -9.81f;
+    public float slowSpeed = 6f, runSpeed = 15f, moveSpeed, turnSpeed = 0.1f,
+        jumpTimer = 0.5f, jumpCut = 0.025f, divePower = 2.5f, launchPower, 
+        highGravityScale = 2.5f, lowGravityScale = 2.0f;
+    private float diveMulti = 1.0f, launchMulti = 1.0f;
     public float[] jumpPower = { 7f, 10f, 14f };
-    private int jumps = 0,
-        maxJumps = 3,
-        jumpStage = 0;
-    private bool canMove = true;
-    public bool isGrounded;
+    private int jumps = 0, maxJumps = 3, jumpStage = 0;
+    private bool canMove = true, dive = false;
+    public bool isGrounded, holdJump, launch = false;
 
     void Start()
     {
         cc = GetComponent<CharacterController>();
+        anim = GetComponentInChildren<Animator>();
         moveSpeed = runSpeed;
     }
 
     void Update()
     {
-        if (Input.GetButtonDown("Jump") && isGrounded)
+        if (Input.GetButtonDown("Jump"))
         {
-            Jump();
+            if (isGrounded)
+            {
+                Jump();
+                anim.SetBool("isGrounded", false);
+            } 
+            else
+            {
+                dive = true;
+            }
+        }
+
+        if (Input.GetButtonUp("Jump") && holdJump)
+        {
+            holdJump = false;
+        }
+
+        if (Input.GetAxis("Vertical") == 0 && Input.GetAxis("Horizontal") == 0)
+        {
+            anim.SetBool("isMoving", false);
+        }
+        else
+        {
+            anim.SetBool("isMoving", true);
         }
     }
 
     void FixedUpdate()
     {
-        // This is my gross solution to finding out the exact frame the player lands after a jump. I did my best leave me alone.
-        if (jumpStage == 1)
+        if (!launch)
         {
-            jumpStage = 2;
+            // This is part of my gross solution to finding out the exact frame the player lands after a jump. I did my best leave me alone.
+            if (jumpStage == 1)
+            {
+                jumpStage = 2;
+            }
+
+            GetMovement();
+
+            if (dive)
+            {
+                Dive();
+            }
+        }
+        else
+        {
+            if (isGrounded)
+            {
+                launch = false;
+            }
+
+            Launch();
         }
         
-        GetMovement();
 
-        if (isGrounded)
-        {
-            if (moveDir != Vector3.zero)
-            {
-                //Turn();
-            }
-
-            if (velocity.y < 0)
-            {
-                velocity.y = 0;
-            }
-        }
-
-        // Moves player according to movement direction
+        // Moves player according to movement direction then turn player towards direction
         cc.Move(moveDir * Time.deltaTime);
         InstantTurn();
+
         // Applies gravity to player
-        velocity.y += gravityBase * Time.deltaTime;
+        ApplyGravity();
         cc.Move(velocity * Time.deltaTime);
 
+        // Check if player is on the ground, if so and had just landed start jump timer for triple jump mechanic
         isGrounded = cc.isGrounded;
         if (isGrounded && jumpStage == 2)
         {
             StartCoroutine(JumpTimer());
+            anim.SetBool("isGrounded", true);
+            dive = false;
+            diveMulti = 1.0f;
         }
     }
 
@@ -97,7 +126,7 @@ public class PlayerMovement : MonoBehaviour
         moveDir *= moveSpeed;
     }
 
-    // Ensures player smoothly turns to face the direction they're moving in
+    // Ensures player smoothly turns to face the direction they're moving in, currently obsolete
     void Turn()
     {
         Quaternion lookDir = Quaternion.LookRotation(moveDir);
@@ -117,7 +146,7 @@ public class PlayerMovement : MonoBehaviour
     void Jump()
     {
         InstantTurn();
-        velocity.y += Mathf.Sqrt(jumpPower[jumps] * -2.0f * gravityBase);
+        velocity.y += Mathf.Sqrt(jumpPower[jumps] * -2.0f * Physics.gravity.y);
 
         jumps++;
         if (jumps >= maxJumps)
@@ -126,6 +155,46 @@ public class PlayerMovement : MonoBehaviour
         }
 
         jumpStage = 1;
+        holdJump = true;
+    }
+
+    void Dive()
+    {
+        moveDir = moveDir * divePower * diveMulti;
+        diveMulti += 0.05f;
+        jumps = 0;
+    }
+
+    void Launch()
+    {
+        moveDir = moveDir * launchPower * launchMulti;
+        launchMulti += 0.00f;
+        jumps = 0;
+    }
+
+    // Adjusts player's y-value to simulate gravity
+    void ApplyGravity()
+    {
+        if (isGrounded && velocity.y < 0 || launch) // Player is on the ground
+        {
+            velocity.y = Physics.gravity.y * Time.deltaTime;
+            anim.SetBool("isFalling", false);
+            return;
+        }
+
+        if (velocity.y < 0) // Player is falling after apex of jump
+        {
+            velocity.y += Physics.gravity.y * (highGravityScale - 1) * Time.deltaTime;
+            anim.SetBool("isFalling", true);
+        } 
+        else if (velocity.y > 0 && !holdJump) // Player is jumping but let go of jump button
+        {
+            velocity.y += Physics.gravity.y * (lowGravityScale - 1) * Time.deltaTime;
+        } 
+        else // Player is jumping and still holding jump button
+        {
+            velocity.y += Physics.gravity.y * Time.deltaTime;
+        }
     }
 
     // Tracks how long the player has been on the ground since last jump, needed for triple jump
