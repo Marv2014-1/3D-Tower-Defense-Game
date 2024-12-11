@@ -6,26 +6,21 @@ public class RuinedTower : MonoBehaviour
 {
     public GameObject towerPrefab;
     public GameObject arrowPrefab; // Assign the Arrow prefab in the Inspector
-   // public Transform arrowSpawnPoint; 
-  //add collider that detects if player is standing near using OnTriggerEnter
-
+    private bool playerNear;
     // Start is called before the first frame update
     void Start()
     {
-        
+        playerNear = false;
     }
 
     // Update is called once per frame
     void Update()
     {
-      if (Input.GetKeyDown(KeyCode.E)){
-        UpgradeTower();
+      if(playerNear){
+        if (Input.GetKeyDown(KeyCode.E)){
+          UpgradeTower();
+        }
       }
-
-    }
-
-    void FixedUpdate(){
-        
     }
 
     void UpgradeTower(){
@@ -36,6 +31,20 @@ public class RuinedTower : MonoBehaviour
         //tower.arrowSpawnPoint = arrowSpawnPoint;
         Debug.Log("Tower Upgraded");
         Destroy(gameObject);
+    }
+
+    void OnTriggerEnter(Collider collision){
+      if (collision.CompareTag("Player")){
+        playerNear = true;
+        Debug.Log("Player in upgrade range");
+      }
+    }
+
+    void OnTriggerExit(Collider collision){
+      if (collision.CompareTag("Player")){
+        playerNear = false;
+        Debug.Log("Player left upgrade range");
+      }
     }
 }
 
