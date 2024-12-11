@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 
 public class MusicPlayer : MonoBehaviour
 {
-    public AudioClip menuSong, storySong;
+    public AudioClip menuSong, storySong, gameSong;
     public static MusicPlayer instance;
     public static AudioSource music;
     public AudioMixer audioMixer;
@@ -44,7 +44,11 @@ public class MusicPlayer : MonoBehaviour
         else if (sceneName == "Story")
         {
             music.clip = storySong;
-        } else
+        } else if (sceneName == "Game")
+        {
+            music.clip = gameSong;
+        }
+        else
         {
             music.clip = null;
         }

@@ -3010,6 +3010,10 @@ PrefabInstance:
       value: 
       objectReference: {fileID: 1535358094205992237, guid: 8ce331fc7cd55bb448c629b4870905bf, type: 2}
     - target: {fileID: 4651723012201854843, guid: c8a8e55a77db0f1439edb86a17640454, type: 3}
+      propertyPath: gameSong
+      value: 
+      objectReference: {fileID: 8300000, guid: ae5986bc98b106a4eba132706f6ba002, type: 3}
+    - target: {fileID: 4651723012201854843, guid: c8a8e55a77db0f1439edb86a17640454, type: 3}
       propertyPath: menuSong
       value: 
       objectReference: {fileID: 8300000, guid: 30367ce3ff4948c4593f548da8949d5e, type: 3}
