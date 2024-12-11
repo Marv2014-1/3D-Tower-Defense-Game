@@ -854,4 +854,4 @@ MonoBehaviour:
   waypoints: []
   attackRange: 3
   attackCooldown: 2
-  enemyWeapon: {fileID: 0}
+  enemyWeapon: {fileID: 3647000459666796852, guid: 53903a6b406b96c4888e66ec183b1618, type: 3}
