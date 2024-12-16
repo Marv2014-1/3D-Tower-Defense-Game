@@ -52,7 +52,7 @@ public class ScoreManager : MonoBehaviour
 
             UpdateMenu();
         }
-        else if (sceneName == "GameStart")
+        else if (sceneName == "Game")
         {
             GameShow();
             ZeroScore();

@@ -4,23 +4,28 @@ using UnityEngine;
 
 public class RuinedTower : MonoBehaviour
 {
+    public int cost = 100;
     public GameObject towerPrefab;
     public GameObject arrowPrefab; // Assign the Arrow prefab in the Inspector
     private bool playerNear;
+    private Coins playerCoins;
+
     // Start is called before the first frame update
     void Start()
     {
         playerNear = false;
+        playerCoins = FindObjectOfType<Coins>();
     }
 
     // Update is called once per frame
     void Update()
     {
-      if(playerNear){
-        if (Input.GetKeyDown(KeyCode.E)){
-          UpgradeTower();
+        if (playerNear && Input.GetKeyDown(KeyCode.E) && playerCoins.checkCoins(cost))
+        {
+            playerCoins.removeCoins(cost);
+            UpgradeTower();
         }
-      }
+
     }
 
     void UpgradeTower(){
