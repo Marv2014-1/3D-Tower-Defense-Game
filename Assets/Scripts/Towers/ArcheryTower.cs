@@ -7,7 +7,7 @@ public class ArcheryTower : Tower
     [Header("Arrow Settings")]
     public GameObject arrowPrefab; // Assign the Arrow prefab in the Inspector
     private Transform arrowSpawnPoint; 
-    public float arrowSpeed = 10f;
+    public float arrowSpeed = 50f;
     public float arrowRange = 20f;
 
 

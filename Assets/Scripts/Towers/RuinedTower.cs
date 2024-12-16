@@ -1,9 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
+using TMPro;
 
 public class RuinedTower : MonoBehaviour
 {
+    public TMP_Text displayText; //assign ui element in inspector
     public GameObject towerPrefab;
     public GameObject arrowPrefab; // Assign the Arrow prefab in the Inspector
     private bool playerNear;
@@ -11,6 +14,13 @@ public class RuinedTower : MonoBehaviour
     void Start()
     {
         playerNear = false;
+        if (displayText != null)
+        {
+            displayText.gameObject.SetActive(false);
+        }
+        else{
+          Debug.Log("displayText not assigned in editor");
+        }
     }
 
     // Update is called once per frame
@@ -21,6 +31,7 @@ public class RuinedTower : MonoBehaviour
           UpgradeTower();
         }
       }
+
     }
 
     void UpgradeTower(){
@@ -37,6 +48,11 @@ public class RuinedTower : MonoBehaviour
       if (collision.CompareTag("Player")){
         playerNear = true;
         Debug.Log("Player in upgrade range");
+        if (displayText != null)
+        {
+            displayText.text = "Press E to upgrade tower! (Cost: 100 Gold)"; // Set the text
+            displayText.gameObject.SetActive(true); // Show the UI text
+        }
       }
     }
 
@@ -44,6 +60,10 @@ public class RuinedTower : MonoBehaviour
       if (collision.CompareTag("Player")){
         playerNear = false;
         Debug.Log("Player left upgrade range");
+        if (displayText != null)
+        {
+            displayText.gameObject.SetActive(false); // Hide the UI text
+        }
       }
     }
 }
