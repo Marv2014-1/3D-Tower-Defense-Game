@@ -59,6 +59,8 @@ public class Arrow : MonoBehaviour
             // Calculate direction from arrow's position to target
             Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
 
+            Debug.DrawLine(transform.position, target.transform.position, Color.red, 0.5f);
+            Debug.DrawRay(transform.position, directionToTarget, Color.green, 0.5f);
             // Determine the target rotation
             Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
 

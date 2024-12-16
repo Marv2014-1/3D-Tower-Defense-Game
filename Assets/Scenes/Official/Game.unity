@@ -1350,6 +1350,10 @@ PrefabInstance:
       value: ArcheryTower
       objectReference: {fileID: 0}
     - target: {fileID: 2829424587664641172, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
+      propertyPath: range
+      value: 200
+      objectReference: {fileID: 0}
+    - target: {fileID: 2829424587664641172, guid: 4c0976e2107ee6e488699644f0665559, type: 3}
       propertyPath: cooldown
       value: 750
       objectReference: {fileID: 0}
