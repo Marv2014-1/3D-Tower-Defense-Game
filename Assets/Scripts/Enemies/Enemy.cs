@@ -5,6 +5,7 @@ public class Enemy : MonoBehaviour
 {
     [Header("Enemy Attributes")]
     public int maxHealth = 20;
+    public int coinDrop = 15;
     public float moveSpeed = 2f;
     public float rotationSpeed = 360f; // Degrees per second for rotation
 
@@ -110,6 +111,20 @@ public class Enemy : MonoBehaviour
 
         isDead = true; // Mark the enemy as dead
         animator.SetBool("IsDead", true);
+
+        // Give player coins on death
+        Coins playerCoins = FindObjectOfType<Coins>();
+        if (playerCoins != null)
+        {
+            playerCoins.addCoins(coinDrop);
+        }
+
+        // Updates player's score on death
+        ScoreManager score = FindObjectOfType<ScoreManager>();
+        if (score != null)
+        {
+            score.UpdateScore(coinDrop);
+        }
 
         // Disable movement and other components during death
         rb.isKinematic = true;
