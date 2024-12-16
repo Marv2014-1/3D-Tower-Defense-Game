@@ -36,6 +36,7 @@ public class Arrow : MonoBehaviour
 
     private void Start()
     {
+        //transform.rotation = transform.rotation * Quaternion.Euler(-90, 0, 0);
         startPosition = transform.position;
         rb = GetComponent<Rigidbody>();
         if (rb == null)
@@ -56,13 +57,16 @@ public class Arrow : MonoBehaviour
     {
         if (target != null)
         {
+            Vector3 offset = new Vector3(0, 1, 0);
             // Calculate direction from arrow's position to target
-            Vector3 directionToTarget = (target.transform.position - transform.position).normalized;
+            Vector3 directionToTarget = (target.transform.position - transform.position + offset).normalized;
+            //Quaternion correction = Quaternion.Euler(-90, 0, 0); // Adjust as necessary
 
             Debug.DrawLine(transform.position, target.transform.position, Color.red, 0.5f);
             Debug.DrawRay(transform.position, directionToTarget, Color.green, 0.5f);
             // Determine the target rotation
             Quaternion targetRotation = Quaternion.LookRotation(directionToTarget);
+            
 
             // Smoothly rotate towards the target
             transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * homingStrength);

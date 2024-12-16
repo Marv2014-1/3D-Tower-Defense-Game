@@ -28,8 +28,16 @@ public class ArcheryTower : Tower
 
         Vector3 offset = new Vector3(0, 2, 0);
         Vector3 direction = (closestEnemy.transform.position - arrowSpawnPoint.position + offset).normalized;
+        
+        Quaternion lookRotation = Quaternion.LookRotation(direction);
+        Quaternion correction = Quaternion.Euler(-90, 0, 0); // Adjust as necessary
 
-        GameObject arrowInstance = Instantiate(arrowPrefab, arrowSpawnPoint.position, Quaternion.LookRotation(direction));
+        GameObject arrowInstance = Instantiate(arrowPrefab, arrowSpawnPoint.position, lookRotation);
+
+        
+
+        //arrowInstance.transform.rotation = lookRotation * correction;
+
         Arrow arrow = arrowInstance.GetComponent<Arrow>();
         if (arrow != null)
         {
