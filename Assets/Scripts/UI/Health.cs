@@ -26,7 +26,7 @@ public class Health : MonoBehaviour
         }
     }
 
-    public void TakeDamage(int Damage)
+    private void TakeDamage(int Damage)
     {
         currentHealth-= Damage;
         currentHealth= Mathf.Clamp(currentHealth,0,maxHealth);
@@ -48,7 +48,7 @@ public class Health : MonoBehaviour
         healthText.text= currentHealth+ "/" +maxHealth;
     }
 
-    public void Die()
+    private void Die()
     {
         Debug.Log("You DeD");
     }
