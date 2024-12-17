@@ -3,38 +3,32 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// Manages the spawning of enemy waves in the game.
 public class WaveSpawner : MonoBehaviour
 {
-    public static int EnemiesAlive = 0;
-
-    [System.Serializable]
-    public class EnemyType
-    {
-        public string name; // Label for the enemy type
-        public GameObject prefab; // Prefab reference
-    }
-
-    [System.Serializable]
-    public class Wave
-    {
-        public List<EnemyType> enemyTypes = new List<EnemyType>(); // Dynamic enemy types for this wave
-        public List<int> counts = new List<int>(); // Corresponding counts for each type
-        public float rate; // Spawn rate
-    }
-
     [Header("Wave Configuration")]
+    [Tooltip("List of waves to spawn")]
     public List<Wave> waves; // List of waves
 
     [Header("Waypoint Settings")]
+    [Tooltip("Starting point for enemy spawn")]
     public Transform startPoint; // Start spawn point
+
+    [Tooltip("Waypoints for enemy pathing")]
     public Transform[] waypoints; // Array of waypoints to follow
 
     [Header("UI Settings")]
+    [Tooltip("UI Text element to display wave countdown")]
     public Text waveCountdownText;
+
+    [Tooltip("Time between consecutive waves in seconds")]
     public float timeBetweenWaves = 5f;
 
     private float countdown = 2f;
     private int waveIndex = 0;
+
+    // List to keep track of spawned enemies
+    private List<Enemy> spawnedEnemies = new List<Enemy>();
 
     void Update()
     {
@@ -46,7 +40,7 @@ public class WaveSpawner : MonoBehaviour
         }
 
         // Check if there are still enemies alive
-        if (EnemiesAlive > 0) return;
+        if (spawnedEnemies.Count > 0) return;
 
         // Check if all waves have been completed
         if (waveIndex >= waves.Count)
@@ -71,6 +65,7 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
+    /// Coroutine to spawn all enemies in the current wave.
     IEnumerator SpawnWave()
     {
         Wave wave = waves[waveIndex];
@@ -82,14 +77,21 @@ public class WaveSpawner : MonoBehaviour
             totalEnemies += wave.counts[i];
         }
 
-        EnemiesAlive = totalEnemies;
+        // Reset the list for the new wave
+        spawnedEnemies.Clear();
 
         // Spawn enemies for this wave
         for (int i = 0; i < wave.enemyTypes.Count; i++)
         {
             for (int j = 0; j < wave.counts[i]; j++)
             {
-                SpawnEnemy(wave.enemyTypes[i].prefab);
+                Enemy enemy = SpawnEnemy(wave.enemyTypes[i].prefab);
+                if (enemy != null)
+                {
+                    // Assign this spawner as the owner
+                    enemy.SetSpawner(this);
+                    spawnedEnemies.Add(enemy);
+                }
                 yield return new WaitForSeconds(1f / wave.rate);
             }
         }
@@ -97,7 +99,8 @@ public class WaveSpawner : MonoBehaviour
         waveIndex++;
     }
 
-    void SpawnEnemy(GameObject enemyPrefab)
+    /// Instantiates an enemy prefab at the start point and assigns waypoints.
+    Enemy SpawnEnemy(GameObject enemyPrefab)
     {
         // Instantiate the enemy at the start point
         GameObject enemyInstance = Instantiate(enemyPrefab, startPoint.position, startPoint.rotation);
@@ -107,6 +110,24 @@ public class WaveSpawner : MonoBehaviour
         if (enemy != null)
         {
             enemy.waypoints = waypoints;
+        }
+
+        return enemy;
+    }
+
+    /// Callback method for when an enemy dies
+    public void OnEnemyDeath(Enemy enemy)
+    {
+        if (spawnedEnemies.Contains(enemy))
+        {
+            spawnedEnemies.Remove(enemy);
+        }
+
+        // Check if all enemies are dead to spawn the next wave
+        if (spawnedEnemies.Count == 0)
+        {
+            // Optionally, reset countdown here if you want to delay the next wave
+            countdown = timeBetweenWaves;
         }
     }
 }

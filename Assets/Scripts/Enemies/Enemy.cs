@@ -19,6 +19,9 @@ public class Enemy : MonoBehaviour
 
     private bool isDead = false; // Ensure actions stop after death
 
+    // Reference to the owning WaveSpawner
+    private WaveSpawner spawner;
+
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody>();
@@ -59,7 +62,7 @@ public class Enemy : MonoBehaviour
         {
             // Calculate target rotation towards the direction
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            
+
             // Smoothly rotate towards the target rotation
             Quaternion newRotation = Quaternion.RotateTowards(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             rb.MoveRotation(newRotation);
@@ -78,8 +81,8 @@ public class Enemy : MonoBehaviour
     private void ReachedEndOfPath()
     {
         // Custom behavior when the enemy reaches the final waypoint
+        NotifySpawnerOfDeath();
         Destroy(gameObject);
-        WaveSpawner.EnemiesAlive--;
     }
 
     public void TakeDamage(int damage)
@@ -136,12 +139,29 @@ public class Enemy : MonoBehaviour
             collider.enabled = false;
         }
 
+        // Notify the spawner before destruction
+        NotifySpawnerOfDeath();
+
         Destroy(gameObject, 2f); // Wait for death animation before destroying
+    }
+
+    /// Assigns the owning WaveSpawner to this enemy
+    public void SetSpawner(WaveSpawner spawner)
+    {
+        this.spawner = spawner;
+    }
+
+    /// Notifies the owning spawner that this enemy has died
+    private void NotifySpawnerOfDeath()
+    {
+        if (spawner != null)
+        {
+            spawner.OnEnemyDeath(this);
+        }
     }
 
     public bool IsDead()
     {
         return isDead;
     }
-
 }
