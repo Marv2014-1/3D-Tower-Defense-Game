@@ -19,16 +19,32 @@ public class Enemy : MonoBehaviour
 
     private bool isDead = false; // Ensure actions stop after death
 
+    // Reference to the owning WaveSpawner
+    private WaveSpawner spawner;
+    public Vector3 Velocity { get; private set; }
+
+    // Reference to the CastleHealthManager
+    private CastleHealthManager castleHealthManager;
+
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         currentHealth = maxHealth;
+
+        // Find the CastleHealthManager in the scene
+        castleHealthManager = FindObjectOfType<CastleHealthManager>();
+        if (castleHealthManager == null)
+        {
+            Debug.LogError("CastleHealthManager not found in the scene!");
+        }
     }
 
     protected virtual void Update()
     {
         if (isDead) return; // Stop all actions if the enemy is dead
+
+        Velocity = rb.velocity;
 
         if (currentHealth <= 0)
         {
@@ -59,7 +75,7 @@ public class Enemy : MonoBehaviour
         {
             // Calculate target rotation towards the direction
             Quaternion targetRotation = Quaternion.LookRotation(direction);
-            
+
             // Smoothly rotate towards the target rotation
             Quaternion newRotation = Quaternion.RotateTowards(rb.rotation, targetRotation, rotationSpeed * Time.deltaTime);
             rb.MoveRotation(newRotation);
@@ -77,9 +93,15 @@ public class Enemy : MonoBehaviour
 
     private void ReachedEndOfPath()
     {
-        // Custom behavior when the enemy reaches the final waypoint
+        // Damage the castle
+        if (castleHealthManager != null)
+        {
+            castleHealthManager.DamageCastle(1);
+        }
+
+        // Notify the spawner and destroy the enemy
+        NotifySpawnerOfDeath();
         Destroy(gameObject);
-        WaveSpawner.EnemiesAlive--;
     }
 
     public void TakeDamage(int damage)
@@ -136,12 +158,29 @@ public class Enemy : MonoBehaviour
             collider.enabled = false;
         }
 
+        // Notify the spawner before destruction
+        NotifySpawnerOfDeath();
+
         Destroy(gameObject, 2f); // Wait for death animation before destroying
+    }
+
+    /// Assigns the owning WaveSpawner to this enemy
+    public void SetSpawner(WaveSpawner spawner)
+    {
+        this.spawner = spawner;
+    }
+
+    /// Notifies the owning spawner that this enemy has died
+    private void NotifySpawnerOfDeath()
+    {
+        if (spawner != null)
+        {
+            spawner.OnEnemyDeath(this);
+        }
     }
 
     public bool IsDead()
     {
         return isDead;
     }
-
 }
