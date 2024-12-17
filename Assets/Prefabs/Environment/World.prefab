@@ -437,7 +437,7 @@ Transform:
   m_GameObject: {fileID: 5321712810606352760}
   serializedVersion: 2
   m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 90, y: 0, z: -90}
+  m_LocalPosition: {x: 120, y: 0, z: -150}
   m_LocalScale: {x: 1, y: 1, z: 1}
   m_ConstrainProportionsScale: 0
   m_Children: []
@@ -458,13 +458,14 @@ MonoBehaviour:
   cloudPrefabs:
   - {fileID: 919132149155446097, guid: a0da8f8ac096b10498211fe5b161eb66, type: 3}
   - {fileID: 919132149155446097, guid: d9ff05fe3c0e5e7428b5007917d4d64c, type: 3}
-  cloudDensity: 10
-  spawnRadius: 300
-  despawnDistance: 600
-  cloudSpeed: 2
+  initialCloudDensity: 10
+  maxAdditionalClouds: 20
+  spawnRadius: 350
+  despawnDistance: 425
+  cloudSpeed: 3
   spawnHeightMin: 65
   spawnHeightMax: 75
-  spawnDelay: 0.5
+  spawnDelay: 1
 --- !u!1 &6430005873037289130
 GameObject:
   m_ObjectHideFlags: 0
