@@ -411,6 +411,60 @@ Transform:
   - {fileID: 4829223773970500313}
   m_Father: {fileID: 996395647091912301}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!1 &5321712810606352760
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 5331253132702850564}
+  - component: {fileID: 6334887115149099801}
+  m_Layer: 0
+  m_Name: Clouds
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &5331253132702850564
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321712810606352760}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 90, y: 0, z: -90}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 996395647091912301}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
+--- !u!114 &6334887115149099801
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 5321712810606352760}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 0090cac32a6a9cf4b806f9bca71c72e9, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  cloudPrefabs:
+  - {fileID: 919132149155446097, guid: a0da8f8ac096b10498211fe5b161eb66, type: 3}
+  - {fileID: 919132149155446097, guid: d9ff05fe3c0e5e7428b5007917d4d64c, type: 3}
+  cloudDensity: 10
+  spawnRadius: 300
+  despawnDistance: 600
+  cloudSpeed: 2
+  spawnHeightMin: 65
+  spawnHeightMax: 75
+  spawnDelay: 0.5
 --- !u!1 &6430005873037289130
 GameObject:
   m_ObjectHideFlags: 0
@@ -1217,6 +1271,7 @@ Transform:
   - {fileID: 9094325778819354816}
   - {fileID: 4740101118728611117}
   - {fileID: 7505229256766885764}
+  - {fileID: 5331253132702850564}
   m_Father: {fileID: 0}
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &8201013865180187

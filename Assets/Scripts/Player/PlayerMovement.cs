@@ -11,13 +11,17 @@ public class PlayerMovement : MonoBehaviour
     public Vector3 moveDir = Vector3.zero,
         velocity;
     public float slowSpeed = 6f, runSpeed = 15f, moveSpeed, turnSpeed = 0.1f,
-        jumpTimer = 0.5f, jumpCut = 0.025f, divePower = 2.5f, launchPower, 
+        jumpTimer = 0.5f, jumpCut = 0.025f, divePower = 2.5f, launchPower,
         highGravityScale = 2.5f, lowGravityScale = 2.0f;
     private float diveMulti = 1.0f, launchMulti = 1.0f;
     public float[] jumpPower = { 7f, 10f, 14f };
     private int jumps = 0, maxJumps = 3, jumpStage = 0;
     private bool canMove = true, dive = false;
     public bool isGrounded, holdJump, launch = false;
+
+    // Attack variables
+    public float attackCooldown = 1.0f; // seconds
+    private bool isAttacking = false;
 
     void Start()
     {
@@ -28,32 +32,8 @@ public class PlayerMovement : MonoBehaviour
 
     void Update()
     {
-        if (Input.GetButtonDown("Jump"))
-        {
-            if (isGrounded)
-            {
-                Jump();
-                anim.SetBool("isGrounded", false);
-            } 
-            else
-            {
-                dive = true;
-            }
-        }
-
-        if (Input.GetButtonUp("Jump") && holdJump)
-        {
-            holdJump = false;
-        }
-
-        if (Input.GetAxis("Vertical") == 0 && Input.GetAxis("Horizontal") == 0)
-        {
-            anim.SetBool("isMoving", false);
-        }
-        else
-        {
-            anim.SetBool("isMoving", true);
-        }
+        HandleMovementInput();
+        HandleAttackInput();
     }
 
     void FixedUpdate()
@@ -82,7 +62,6 @@ public class PlayerMovement : MonoBehaviour
 
             Launch();
         }
-        
 
         // Moves player according to movement direction then turn player towards direction
         cc.Move(moveDir * Time.deltaTime);
@@ -101,6 +80,67 @@ public class PlayerMovement : MonoBehaviour
             dive = false;
             diveMulti = 1.0f;
         }
+    }
+
+    /// Handles movement-related input.
+    void HandleMovementInput()
+    {
+        if (Input.GetButtonDown("Jump"))
+        {
+            if (isGrounded)
+            {
+                Jump();
+                anim.SetBool("isGrounded", false);
+            }
+            else
+            {
+                dive = true;
+            }
+        }
+
+        if (Input.GetButtonUp("Jump") && holdJump)
+        {
+            holdJump = false;
+        }
+
+        if (Input.GetAxis("Vertical") == 0 && Input.GetAxis("Horizontal") == 0)
+        {
+            anim.SetBool("isMoving", false);
+        }
+        else
+        {
+            anim.SetBool("isMoving", true);
+        }
+    }
+
+    /// Handles attack-related input.
+    void HandleAttackInput()
+    {
+        // Detect left mouse button click for attack
+        if (Input.GetMouseButtonDown(0) && !isAttacking)
+        {
+            StartCoroutine(Attack());
+        }
+    }
+
+    /// Coroutine to handle the attack action and cooldown.
+    IEnumerator Attack()
+    {
+        isAttacking = true;
+
+        // Trigger attack animation
+        anim.SetTrigger("isAttacking");
+
+        // disable movement during attack
+        canMove = false;
+
+        // Wait for the duration of the attack animation
+        yield return new WaitForSeconds(0.5f);
+        canMove = true;
+
+        // Start cooldown
+        yield return new WaitForSeconds(attackCooldown);
+        isAttacking = false;
     }
 
     void GetMovement()
@@ -186,11 +226,11 @@ public class PlayerMovement : MonoBehaviour
         {
             velocity.y += Physics.gravity.y * (highGravityScale - 1) * Time.deltaTime;
             anim.SetBool("isFalling", true);
-        } 
+        }
         else if (velocity.y > 0 && !holdJump) // Player is jumping but let go of jump button
         {
             velocity.y += Physics.gravity.y * (lowGravityScale - 1) * Time.deltaTime;
-        } 
+        }
         else // Player is jumping and still holding jump button
         {
             velocity.y += Physics.gravity.y * Time.deltaTime;
