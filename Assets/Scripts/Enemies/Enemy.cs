@@ -21,17 +21,30 @@ public class Enemy : MonoBehaviour
 
     // Reference to the owning WaveSpawner
     private WaveSpawner spawner;
+    public Vector3 Velocity { get; private set; }
+
+    // Reference to the CastleHealthManager
+    private CastleHealthManager castleHealthManager;
 
     protected virtual void Awake()
     {
         rb = GetComponent<Rigidbody>();
         animator = GetComponent<Animator>();
         currentHealth = maxHealth;
+
+        // Find the CastleHealthManager in the scene
+        castleHealthManager = FindObjectOfType<CastleHealthManager>();
+        if (castleHealthManager == null)
+        {
+            Debug.LogError("CastleHealthManager not found in the scene!");
+        }
     }
 
     protected virtual void Update()
     {
         if (isDead) return; // Stop all actions if the enemy is dead
+
+        Velocity = rb.velocity;
 
         if (currentHealth <= 0)
         {
@@ -80,7 +93,13 @@ public class Enemy : MonoBehaviour
 
     private void ReachedEndOfPath()
     {
-        // Custom behavior when the enemy reaches the final waypoint
+        // Damage the castle
+        if (castleHealthManager != null)
+        {
+            castleHealthManager.DamageCastle(1);
+        }
+
+        // Notify the spawner and destroy the enemy
         NotifySpawnerOfDeath();
         Destroy(gameObject);
     }
