@@ -16,6 +16,8 @@ public class Enemy : MonoBehaviour
     protected Animator animator; // Allow access in child classes
     protected int currentHealth;
 
+    private Health health;
+
     private bool isDead = false; // Ensure actions stop after death
 
     protected virtual void Awake()
@@ -79,6 +81,10 @@ public class Enemy : MonoBehaviour
         // Custom behavior when the enemy reaches the final waypoint
         Destroy(gameObject);
         WaveSpawner.EnemiesAlive--;
+       
+       
+
+
     }
 
     public void TakeDamage(int damage)
