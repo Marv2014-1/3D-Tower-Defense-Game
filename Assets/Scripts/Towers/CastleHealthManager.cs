@@ -16,7 +16,7 @@ public class CastleHealthManager : MonoBehaviour
     public GameObject endMenu;     // Reference to the EndMenu GameObject
     public TMP_Text endMenuText;   // Reference to the TextMeshPro component within EndMenu
 
-    void Start()
+    void Awake()
     {
         currentHealth = maxHealth;
         UpdateUI();
@@ -28,14 +28,23 @@ public class CastleHealthManager : MonoBehaviour
         }
         else
         {
-            Debug.LogWarning("EndMenu is not assigned in the CastleHealthManager.");
+            Debug.LogError("EndMenu is not assigned in the Inspector!");
         }
     }
 
-    /// <summary>
+    void Start()
+    {
+        if (endMenu != null)
+        {
+            Debug.Log("EndMenu successfully set.");
+        }
+        else
+        {
+            Debug.LogError("EndMenu is null in Start!");
+        }
+    }
+
     /// Applies damage to the castle and updates the UI.
-    /// </summary>
-    /// <param name="damage">Amount of damage to apply.</param>
     public void DamageCastle(int damage)
     {
         currentHealth -= damage;
@@ -48,9 +57,7 @@ public class CastleHealthManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Updates the health bar and health text UI elements.
-    /// </summary>
     private void UpdateUI()
     {
         if (HealthBarFill != null)
@@ -64,40 +71,40 @@ public class CastleHealthManager : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Handles the castle's destruction by triggering the EndMenu.
-    /// </summary>
     private void HandleCastleDestruction()
     {
         Debug.Log("The castle has been destroyed!");
 
-        // Trigger EndMenu with "Game Over!" message
-        TriggerEndMenu("Game Over!");
+        Time.timeScale = 0f;
+
+        // Set the desired message
+        endMenuText.text = "Game Over!";
+
+        // Enable the EndMenu GameObject
+        endMenu.SetActive(true);
+
+        Cursor.lockState = CursorLockMode.None;
+
+        this.enabled = false;
     }
 
     /// Triggers the EndMenu with the specified message.
-    private void TriggerEndMenu(string message)
-    {
-        if (endMenu != null && endMenuText != null)
-        {
-            // Set the desired message
-            endMenuText.text = message;
+    // private void TriggerEndMenu(string message)
+    // {
+    //         // Set the desired message
+    //         endMenuText.text = message;
 
-            // Enable the EndMenu GameObject
-            endMenu.SetActive(true);
+    //         // Enable the EndMenu GameObject
+    //         endMenu.SetActive(true);
 
-            Cursor.lockState = CursorLockMode.None;
+    //         Cursor.lockState = CursorLockMode.None;
 
-            // Pause the game
-            Time.timeScale = 0f;
+    //         // Pause the game
+    //         Time.timeScale = 0f;
 
-            this.enabled = false;
-        }
-        else
-        {
-            Debug.LogWarning("EndMenu or EndMenuText is not assigned in the CastleHealthManager.");
-        }
-    }
+    //         this.enabled = false;
+    // }
 
     public int GetCurrentHealth()
     {

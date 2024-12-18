@@ -1,8 +1,8 @@
-using TMPro;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
+using TMPro;
 
 public class WaveManager : MonoBehaviour
 {
@@ -20,16 +20,23 @@ public class WaveManager : MonoBehaviour
     public GameObject endMenu;          // Reference to the EndMenu GameObject
     public TMP_Text endMenuText;        // Reference to the TextMeshPro component within EndMenu
 
-    public float timeBetweenWaves = 10f;
+    [Header("Spawn Conditions")]
+    public int enemyThreshold = 3;                 // Threshold for enemy count
+    public float timeThreshold = 15f;               // Duration to wait before spawning next wave
+    public float enemyCountUnchangedThreshold = 45f; // Time in seconds to wait before starting next wave if enemy count is unchanged
 
     private float countdown;
     private int waveIndex = 0;
-    private bool doneCounting = false;
+    private bool isCountingDown = false;
     private List<Enemy> allSpawnedEnemies = new List<Enemy>();
+
+    // Variables to track enemy count changes
+    private float timeSinceEnemyCountChanged = 0f;
+    private int lastEnemyCount = 0;
 
     void Start()
     {
-        countdown = timeBetweenWaves;
+        countdown = timeThreshold;
         Enemy.OnEnemyDeath += HandleEnemyDeath;
         UpdateWaveUI();
 
@@ -42,6 +49,12 @@ public class WaveManager : MonoBehaviour
         {
             Debug.LogWarning("EndMenu is not assigned in the WaveManager.");
         }
+
+        lastEnemyCount = allSpawnedEnemies.Count;
+        timeSinceEnemyCountChanged = 0f;
+
+        // Optionally start the first wave automatically
+        StartCoroutine(SpawnWave());
     }
 
     void Update()
@@ -54,49 +67,90 @@ public class WaveManager : MonoBehaviour
             return;
         }
 
-        // If there are active enemies, update the UI and skip the countdown
-        if (allSpawnedEnemies.Count > 0)
+        // Current number of active enemies
+        int currentEnemyCount = allSpawnedEnemies.Count;
+
+        // Remove any null entries from the enemy list to prevent phantom enemies
+        allSpawnedEnemies.RemoveAll(enemy => enemy == null);
+
+        // Track enemy count changes
+        if (currentEnemyCount != lastEnemyCount)
         {
-            UpdateWaveUI();
-            return;
+            timeSinceEnemyCountChanged = 0f;
+            lastEnemyCount = currentEnemyCount;
+        }
+        else
+        {
+            timeSinceEnemyCountChanged += Time.deltaTime;
         }
 
-        // If no enemies remain, run countdown to next wave
-        if (countdown > 0f && !doneCounting)
+        // Start the next wave if enemy count hasn't changed for the threshold duration
+        if (timeSinceEnemyCountChanged >= enemyCountUnchangedThreshold && !isCountingDown)
         {
-            countdown -= Time.deltaTime;
-            UpdateWaveUI();
+            StartCoroutine(SpawnWave());
+            timeSinceEnemyCountChanged = 0f;
+        }
 
-            if (countdown <= 0f)
+        // Check the number of active enemies against the threshold
+        if (currentEnemyCount < enemyThreshold)
+        {
+            if (!isCountingDown)
             {
-                waveCountdownText.text = "Spawning Next Wave!";
-                StartCoroutine(SpawnWave());
-                // Reset countdown for the next wave
-                countdown = timeBetweenWaves;
-                doneCounting = true;
+                isCountingDown = true;
+                countdown = timeThreshold;
+            }
+
+            if (isCountingDown)
+            {
+                countdown -= Time.deltaTime;
+                UpdateWaveUI();
+
+                if (countdown <= 0f)
+                {
+                    StartCoroutine(SpawnWave());
+                    // Reset countdown and counting flag for the next wave
+                    countdown = timeThreshold;
+                    isCountingDown = false;
+                }
             }
         }
         else
         {
-            UpdateWaveUI();
+            // Reset the countdown if enemy count is back to threshold or above
+            if (isCountingDown)
+            {
+                isCountingDown = false;
+                countdown = timeThreshold;
+                UpdateWaveUI();
+            }
         }
     }
 
     IEnumerator SpawnWave()
     {
         if (waveIndex >= waves.Count)
+        {
+            // All waves completed
+            TriggerEndMenu();
             yield break;
+        }
 
         Wave currentWave = waves[waveIndex];
-        waveCounterText.text = $"Wave: {waveIndex + 1}";
+        waveCounterText.text = $"Wave: {waveIndex}";
 
         foreach (WaveSpawner spawner in waveSpawners)
         {
             if (spawner != null)
+            {
                 StartCoroutine(spawner.SpawnWave(currentWave));
+            }
         }
 
-        // Do not increment waveIndex here
+        isCountingDown = false;
+        UpdateWaveUI();
+
+        waveIndex++; // Increment wave index after spawning the wave
+
         yield return null;
     }
 
@@ -107,38 +161,14 @@ public class WaveManager : MonoBehaviour
 
         UpdateWaveUI();
 
-        // Wait a few seconds before checking if all enemies are dead
-        StartCoroutine(CheckAllEnemiesDead());
-
-        // If all enemies are dead, increment waveIndex
-        if (allSpawnedEnemies.Count == 0)
-        {
-            waveIndex++;
-            UpdateWaveUI();
-
-            // Check if all waves are completed
-            if (waveIndex >= waves.Count)
-            {
-                // Trigger EndMenu
-                TriggerEndMenu();
-            }
-        }
-    }
-
-    IEnumerator CheckAllEnemiesDead()
-    {
-        yield return new WaitForSeconds(5f);
-
-        if (allSpawnedEnemies.Count == 0)
-        {
-            doneCounting = false;
-        }
     }
 
     public void RegisterEnemies(List<Enemy> enemies)
     {
         if (enemies != null && enemies.Count > 0)
+        {
             allSpawnedEnemies.AddRange(enemies);
+        }
 
         UpdateWaveUI();
     }
@@ -146,20 +176,20 @@ public class WaveManager : MonoBehaviour
     private void UpdateWaveUI()
     {
         if (waveIndex < waves.Count)
-            waveCounterText.text = $"Wave: {waveIndex + 1}";
+            waveCounterText.text = $"Wave: {waveIndex}";
         else
             waveCounterText.text = "Final Wave!";
 
-        // If enemies are present, show enemy count. Otherwise, show countdown or spawning message.
+        // Update the countdown or enemy count display
         if (allSpawnedEnemies.Count > 0)
         {
             waveCountdownText.text = $"Enemies Left: {allSpawnedEnemies.Count}";
         }
         else
         {
-            if (countdown > 0f && !doneCounting)
+            if (isCountingDown)
                 waveCountdownText.text = $"Next Wave In: {countdown:0.00}s";
-            else if (doneCounting)
+            else
                 waveCountdownText.text = "Spawning Next Wave!";
         }
     }
@@ -188,6 +218,16 @@ public class WaveManager : MonoBehaviour
     }
 
     void OnDestroy()
+    {
+        Enemy.OnEnemyDeath -= HandleEnemyDeath;
+    }
+
+    void OnEnable()
+    {
+        Enemy.OnEnemyDeath += HandleEnemyDeath;
+    }
+
+    void OnDisable()
     {
         Enemy.OnEnemyDeath -= HandleEnemyDeath;
     }
