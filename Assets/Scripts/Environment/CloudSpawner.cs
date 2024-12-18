@@ -84,22 +84,22 @@ public class CloudSpawner : MonoBehaviour
             // Calculate distance from central point
             float distance = Vector3.Distance(transform.position, cloud.transform.position);
 
-            // Check if the cloud has crossed the halfway mark
-            if (distance > halfwayDistance && !cloud.GetComponent<Cloud>().hasPassedHalfway)
-            {
-                // Mark that this cloud has passed halfway
-                Cloud cloudScript = cloud.GetComponent<Cloud>();
-                if (cloudScript != null)
-                {
-                    cloudScript.hasPassedHalfway = true;
-                    // Allow spawning an additional cloud
-                    if (additionalCloudsSpawned < maxAdditionalClouds)
-                    {
-                        currentCloudDensity++;
-                        additionalCloudsSpawned++;
-                    }
-                }
-            }
+            // // Check if the cloud has crossed the halfway mark
+            // if (distance > halfwayDistance && !cloud.GetComponent<Cloud>().hasPassedHalfway)
+            // {
+            //     // Mark that this cloud has passed halfway
+            //     Cloud cloudScript = cloud.GetComponent<Cloud>();
+            //     if (cloudScript != null)
+            //     {
+            //         cloudScript.hasPassedHalfway = true;
+            //         // Allow spawning an additional cloud
+            //         if (additionalCloudsSpawned < maxAdditionalClouds)
+            //         {
+            //             currentCloudDensity++;
+            //             additionalCloudsSpawned++;
+            //         }
+            //     }
+            // }
 
             // Check if the cloud has moved too far
             if (distance > despawnDistance)

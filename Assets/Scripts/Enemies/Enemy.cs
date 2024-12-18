@@ -19,12 +19,16 @@ public class Enemy : MonoBehaviour
 
     private bool isDead = false; // Ensure actions stop after death
 
-    // Reference to the owning WaveSpawner
-    private WaveSpawner spawner;
     public Vector3 Velocity { get; private set; }
 
     // Reference to the CastleHealthManager
     private CastleHealthManager castleHealthManager;
+
+    /// <summary>
+    /// Static event triggered when any enemy dies.
+    /// Subscribed by WaveManager to track active enemies.
+    /// </summary>
+    public static event System.Action<Enemy> OnEnemyDeath;
 
     protected virtual void Awake()
     {
@@ -48,7 +52,7 @@ public class Enemy : MonoBehaviour
 
         if (currentHealth <= 0)
         {
-            PlayDeathAnimation();
+            Die();
             return;
         }
 
@@ -59,6 +63,12 @@ public class Enemy : MonoBehaviour
         else
         {
             ReachedEndOfPath();
+        }
+
+        // delete the enemy if they go below the map (-5 y)
+        if (transform.position.y < -5)
+        {
+            Die();
         }
     }
 
@@ -98,24 +108,29 @@ public class Enemy : MonoBehaviour
         {
             castleHealthManager.DamageCastle(1);
         }
+        else
+        {
+            Debug.LogError("CastleHealthManager not found in the scene!");
+        }
 
-        // Notify the spawner and destroy the enemy
-        NotifySpawnerOfDeath();
-        Destroy(gameObject);
+        // Notify the WaveManager of death and destroy the enemy
+        Die();
     }
 
-    public void TakeDamage(int damage)
+    /// Applies damage to the enemy.
+    public void TakeDamage(int damageAmount)
     {
         if (isDead || currentHealth <= 0) return;
 
-        currentHealth -= damage;
+        currentHealth -= damageAmount;
         animator.SetBool("IsHurting", true);
 
+        CancelInvoke(nameof(StopHurtAnimation)); // Cancel any existing invokes
         Invoke(nameof(StopHurtAnimation), 0.5f); // Stop hurting animation after a short delay
 
         if (currentHealth <= 0)
         {
-            PlayDeathAnimation();
+            Die();
         }
     }
 
@@ -127,7 +142,8 @@ public class Enemy : MonoBehaviour
         }
     }
 
-    private void PlayDeathAnimation()
+    /// Handles the enemy's death process.
+    private void Die()
     {
         if (isDead) return;
 
@@ -140,12 +156,20 @@ public class Enemy : MonoBehaviour
         {
             playerCoins.addCoins(coinDrop);
         }
+        else
+        {
+            Debug.LogError("Coins component not found in the scene!");
+        }
 
         // Updates player's score on death
         ScoreManager score = FindObjectOfType<ScoreManager>();
         if (score != null)
         {
             score.UpdateScore(coinDrop);
+        }
+        else
+        {
+            Debug.LogError("ScoreManager component not found in the scene!");
         }
 
         // Disable movement and other components during death
@@ -158,26 +182,20 @@ public class Enemy : MonoBehaviour
             collider.enabled = false;
         }
 
-        // Notify the spawner before destruction
-        NotifySpawnerOfDeath();
+        // Notify the WaveManager before destruction
+        NotifyWaveManagerOfDeath();
 
-        Destroy(gameObject, 2f); // Wait for death animation before destroying
+        // Destroy the enemy GameObject after the death animation has played
+        Destroy(gameObject, 2f); // Adjust the delay as per your death animation length
     }
 
-    /// Assigns the owning WaveSpawner to this enemy
-    public void SetSpawner(WaveSpawner spawner)
+    /// Notifies the WaveManager that this enemy has died.
+    private void NotifyWaveManagerOfDeath()
     {
-        this.spawner = spawner;
+        // Trigger the static OnEnemyDeath event
+        OnEnemyDeath?.Invoke(this);
     }
 
-    /// Notifies the owning spawner that this enemy has died
-    private void NotifySpawnerOfDeath()
-    {
-        if (spawner != null)
-        {
-            spawner.OnEnemyDeath(this);
-        }
-    }
 
     public bool IsDead()
     {

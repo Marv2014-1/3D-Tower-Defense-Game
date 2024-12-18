@@ -3,13 +3,11 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
+/// <summary>
 /// Manages the spawning of enemy waves in the game.
+/// </summary>
 public class WaveSpawner : MonoBehaviour
 {
-    [Header("Wave Configuration")]
-    [Tooltip("List of waves to spawn")]
-    public List<Wave> waves; // List of waves
-
     [Header("Waypoint Settings")]
     [Tooltip("Starting point for enemy spawn")]
     public Transform startPoint; // Start spawn point
@@ -17,70 +15,38 @@ public class WaveSpawner : MonoBehaviour
     [Tooltip("Waypoints for enemy pathing")]
     public Transform[] waypoints; // Array of waypoints to follow
 
-    [Header("UI Settings")]
-    [Tooltip("UI Text element to display wave countdown")]
-    public Text waveCountdownText;
+    [Header("Spawner Configuration")]
+    [Tooltip("Rate at which enemies are spawned (enemies per second)")]
+    public float spawnRate = 1f;
 
-    [Tooltip("Time between consecutive waves in seconds")]
-    public float timeBetweenWaves = 5f;
+    // Reference to the WaveManager to register spawned enemies
+    private WaveManager waveManager;
 
-    private float countdown = 2f;
-    private int waveIndex = 0;
-
-    // List to keep track of spawned enemies
-    private List<Enemy> spawnedEnemies = new List<Enemy>();
-
-    void Update()
+    void Start()
     {
-        // Ensure waves are configured
-        if (waves == null || waves.Count == 0)
+        // Find and reference the WaveManager in the scene
+        waveManager = FindObjectOfType<WaveManager>();
+        if (waveManager == null)
         {
-            Debug.LogError("No waves configured in WaveSpawner!");
-            return;
-        }
-
-        // Check if there are still enemies alive
-        if (spawnedEnemies.Count > 0) return;
-
-        // Check if all waves have been completed
-        if (waveIndex >= waves.Count)
-        {
-            Debug.Log("All waves completed!");
-            this.enabled = false; // Stop the WaveSpawner
-            return;
-        }
-
-        // Handle countdown and update UI
-        if (countdown <= 0f)
-        {
-            StartCoroutine(SpawnWave());
-            countdown = timeBetweenWaves;
-        }
-
-        countdown -= Time.deltaTime;
-
-        if (waveCountdownText != null)
-        {
-            waveCountdownText.text = string.Format("{0:00.00}", countdown);
+            Debug.LogError("WaveManager not found in the scene!");
         }
     }
 
-    /// Coroutine to spawn all enemies in the current wave.
-    IEnumerator SpawnWave()
+    /// <summary>
+    /// Coroutine to spawn all enemies in the given wave.
+    /// </summary>
+    /// <param name="wave">The wave configuration to spawn.</param>
+    public IEnumerator SpawnWave(Wave wave)
     {
-        Wave wave = waves[waveIndex];
-        int totalEnemies = 0;
-
-        // Calculate total enemies in the wave
-        for (int i = 0; i < wave.counts.Count; i++)
+        if (wave == null)
         {
-            totalEnemies += wave.counts[i];
+            Debug.LogError("Wave is null in SpawnWave!");
+            yield break;
         }
 
-        // Reset the list for the new wave
-        spawnedEnemies.Clear();
+        List<Enemy> enemiesToRegister = new List<Enemy>();
 
-        // Spawn enemies for this wave
+        // Spawn enemies based on the wave's configuration
         for (int i = 0; i < wave.enemyTypes.Count; i++)
         {
             for (int j = 0; j < wave.counts[i]; j++)
@@ -88,46 +54,44 @@ public class WaveSpawner : MonoBehaviour
                 Enemy enemy = SpawnEnemy(wave.enemyTypes[i].prefab);
                 if (enemy != null)
                 {
-                    // Assign this spawner as the owner
-                    enemy.SetSpawner(this);
-                    spawnedEnemies.Add(enemy);
+                    // Assign waypoints to the enemy
+                    enemy.waypoints = waypoints;
+
+                    // Optionally, set other enemy properties here
+
+                    // Add to the list for registration
+                    enemiesToRegister.Add(enemy);
                 }
-                yield return new WaitForSeconds(1f / wave.rate);
+
+                // Wait based on the spawn rate
+                yield return new WaitForSeconds(1f / spawnRate);
             }
         }
 
-        waveIndex++;
+        // Register the spawned enemies with the WaveManager
+        if (waveManager != null)
+        {
+            waveManager.RegisterEnemies(enemiesToRegister);
+        }
     }
 
-    /// Instantiates an enemy prefab at the start point and assigns waypoints.
-    Enemy SpawnEnemy(GameObject enemyPrefab)
+    /// <summary>
+    /// Instantiates an enemy prefab at the start point.
+    /// </summary>
+    /// <param name="enemyPrefab">The enemy prefab to instantiate.</param>
+    /// <returns>The instantiated Enemy component.</returns>
+    private Enemy SpawnEnemy(GameObject enemyPrefab)
     {
         // Instantiate the enemy at the start point
         GameObject enemyInstance = Instantiate(enemyPrefab, startPoint.position, startPoint.rotation);
 
-        // Assign the waypoints to the enemy
+        // Get the Enemy component
         Enemy enemy = enemyInstance.GetComponent<Enemy>();
-        if (enemy != null)
+        if (enemy == null)
         {
-            enemy.waypoints = waypoints;
+            Debug.LogError("Spawned enemy does not have an Enemy component!");
         }
 
         return enemy;
-    }
-
-    /// Callback method for when an enemy dies
-    public void OnEnemyDeath(Enemy enemy)
-    {
-        if (spawnedEnemies.Contains(enemy))
-        {
-            spawnedEnemies.Remove(enemy);
-        }
-
-        // Check if all enemies are dead to spawn the next wave
-        if (spawnedEnemies.Count == 0)
-        {
-            // Optionally, reset countdown here if you want to delay the next wave
-            countdown = timeBetweenWaves;
-        }
     }
 }

@@ -131,17 +131,17 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   damage: 10
-  range: 100
+  range: 125
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 64
   rotationSpeed: 5
   closestEnemy: {fileID: 0}
   onCooldown: 0
-  cooldown: 1000
+  cooldown: 900
   arrowPrefab: {fileID: 4394720975334778653, guid: e3d5b40166e9b714785b089d8169c3ff, type: 3}
-  arrowSpeed: 50
-  arrowRange: 100
+  arrowSpeed: 55
+  arrowRange: 150
 --- !u!64 &5500745196529579220
 MeshCollider:
   m_ObjectHideFlags: 0
