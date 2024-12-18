@@ -1778,7 +1778,7 @@ MonoBehaviour:
   - enemyTypes:
     - name: Minion
       prefab: {fileID: 1739623006742310432, guid: 64aa84d3c3440ba4fb6d49461931b0b2, type: 3}
-    counts: 1e000000
+    counts: 01000000
     rate: 0
   - enemyTypes:
     - name: Minon
