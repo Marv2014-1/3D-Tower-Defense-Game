@@ -858,8 +858,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   maxHealth: 20
-  coinDrop: 15
-  moveSpeed: 2.3
+  coinDrop: 20
+  moveSpeed: 7
   rotationSpeed: 360
   waypoints: []
   attackRange: 3

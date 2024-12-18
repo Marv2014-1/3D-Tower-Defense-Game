@@ -45,7 +45,7 @@ GameObject:
   - component: {fileID: 2829424587664641172}
   - component: {fileID: 5500745196529579220}
   m_Layer: 0
-  m_Name: ArcheryTower
+  m_Name: ArcheryTower Lv2
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -75,7 +75,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 2022378775009854137}
-  m_Mesh: {fileID: -1867165846391908481, guid: 0cbf32b52191f484cbaad25790820316, type: 3}
+  m_Mesh: {fileID: 6891667589693991931, guid: f4d0b7ffdfc0eb646a2acf6d5293105e, type: 3}
 --- !u!23 &8354911142957205748
 MeshRenderer:
   m_ObjectHideFlags: 0
@@ -130,17 +130,17 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1e296a007d8ccc049aa6895247169905, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  damage: 10
-  range: 200
+  damage: 15
+  range: 300
   enemyLayerMask:
     serializedVersion: 2
     m_Bits: 64
   rotationSpeed: 5
   closestEnemy: {fileID: 0}
   onCooldown: 0
-  cooldown: 500
+  cooldown: 250
   arrowPrefab: {fileID: 4394720975334778653, guid: e3d5b40166e9b714785b089d8169c3ff, type: 3}
-  arrowSpeed: 45
+  arrowSpeed: 75
   arrowRange: 250
 --- !u!64 &5500745196529579220
 MeshCollider:
@@ -204,7 +204,7 @@ MeshFilter:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4801843314385818936}
-  m_Mesh: {fileID: 2143938183155866899, guid: cfafeee41dd45244b9cfab0db281d6d6, type: 3}
+  m_Mesh: {fileID: 995882487541305280, guid: f4d0b7ffdfc0eb646a2acf6d5293105e, type: 3}
 --- !u!23 &871184087032711464
 MeshRenderer:
   m_ObjectHideFlags: 0

@@ -17,7 +17,7 @@ public class WaveSpawner : MonoBehaviour
 
     [Header("Spawner Configuration")]
     [Tooltip("Rate at which enemies are spawned (enemies per second)")]
-    public float spawnRate = 1f;
+    public float spawnRate = 2f;
 
     // Reference to the WaveManager to register spawned enemies
     private WaveManager waveManager;
@@ -32,10 +32,7 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Coroutine to spawn all enemies in the given wave.
-    /// </summary>
-    /// <param name="wave">The wave configuration to spawn.</param>
     public IEnumerator SpawnWave(Wave wave)
     {
         if (wave == null)
@@ -64,7 +61,7 @@ public class WaveSpawner : MonoBehaviour
                 }
 
                 // Wait based on the spawn rate
-                yield return new WaitForSeconds(1f / spawnRate);
+                yield return new WaitForSeconds(spawnRate);
             }
         }
 
@@ -75,11 +72,7 @@ public class WaveSpawner : MonoBehaviour
         }
     }
 
-    /// <summary>
     /// Instantiates an enemy prefab at the start point.
-    /// </summary>
-    /// <param name="enemyPrefab">The enemy prefab to instantiate.</param>
-    /// <returns>The instantiated Enemy component.</returns>
     private Enemy SpawnEnemy(GameObject enemyPrefab)
     {
         // Instantiate the enemy at the start point

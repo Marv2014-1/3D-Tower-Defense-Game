@@ -20,14 +20,16 @@ public class ArcherEnemy : Enemy
 
     private EnemyArrow arrow;
     private Transform playerTransform;
-    private Animator animator;
-    private bool canMove;
+    // private Animator animator;
+
+    private float speed;
     private float attackDamage;
 
     protected override void Awake()
     {
         base.Awake();
         playerTransform = GameObject.FindGameObjectWithTag("Player")?.transform;
+        speed = moveSpeed;
     }
 
     protected override void Update()
@@ -39,7 +41,11 @@ public class ArcherEnemy : Enemy
         // Stop following waypoints if the player is in range and attack
         if (PlayerInRange())
         {
+            moveSpeed = 0;
             AttackPlayer();
+        } else
+        {
+            moveSpeed = speed;
         }
     }
 
@@ -80,13 +86,7 @@ public class ArcherEnemy : Enemy
         SpawnArrowInstance(arrowPrefab, shootPoint.position, arrowRotation, arrowDirection);
     }
 
-    /// <summary>
     /// Handles the instantiation and initialization of an arrow instance.
-    /// </summary>
-    /// <param name="prefab">The arrow prefab to instantiate.</param>
-    /// <param name="position">The spawn position.</param>
-    /// <param name="rotation">The spawn rotation.</param>
-    /// <param name="direction">The direction the arrow will travel.</param>
     private void SpawnArrowInstance(GameObject prefab, Vector3 position, Quaternion rotation, Vector3 direction)
     {
         EnemyArrow arrow = Instantiate(prefab, position, rotation).GetComponent<EnemyArrow>();
@@ -94,11 +94,5 @@ public class ArcherEnemy : Enemy
         {
             arrow.Initialize(direction, bowPower, (int)attackDamage, attackRange, knockBackForce);
         }
-    }
-
-    public void FinishAttack()
-    {
-        // Allow movement again if needed after the attack animation
-        canMove = true;
     }
 }
