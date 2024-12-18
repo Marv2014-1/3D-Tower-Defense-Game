@@ -696,34 +696,12 @@ PrefabInstance:
     m_AddedGameObjects: []
     m_AddedComponents: []
   m_SourcePrefab: {fileID: 100100000, guid: fd4c7c562f4afd248815001e11ef06ea, type: 3}
---- !u!1 &400512349 stripped
-GameObject:
-  m_CorrespondingSourceObject: {fileID: 661575494415784874, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
-  m_PrefabInstance: {fileID: 1940792981}
-  m_PrefabAsset: {fileID: 0}
---- !u!114 &400512351
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400512349}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 85a6c119fc3f35d40a8af13d7794dd4b, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: 
-  maxHealth: 20
-  HealthBarFill: {fileID: 400512352}
-  HealthText: {fileID: 1442288316}
-  endMenu: {fileID: 0}
-  endMenuText: {fileID: 0}
 --- !u!114 &400512352 stripped
 MonoBehaviour:
   m_CorrespondingSourceObject: {fileID: 126866817485661763, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
   m_PrefabInstance: {fileID: 1940792981}
   m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 400512349}
+  m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
   m_Script: {fileID: 11500000, guid: fe87c0e1cc204ed48ad3b37840f39efc, type: 3}
@@ -3634,6 +3612,10 @@ PrefabInstance:
       propertyPath: m_LocalEulerAnglesHint.z
       value: 0
       objectReference: {fileID: 0}
+    - target: {fileID: 7318418572982382362, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
+      propertyPath: m_AnchoredPosition.y
+      value: -25
+      objectReference: {fileID: 0}
     - target: {fileID: 7329821420264065813, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
       propertyPath: m_IsActive
       value: 1
@@ -3657,9 +3639,6 @@ PrefabInstance:
       insertIndex: -1
       addedObject: {fileID: 1012106467}
     m_AddedComponents:
-    - targetCorrespondingSourceObject: {fileID: 661575494415784874, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
-      insertIndex: -1
-      addedObject: {fileID: 400512351}
     - targetCorrespondingSourceObject: {fileID: 4319222680381140142, guid: a6d0123c60475f945a2d1691cd7e3df0, type: 3}
       insertIndex: -1
       addedObject: {fileID: 1313369477}
